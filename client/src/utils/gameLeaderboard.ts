@@ -93,6 +93,28 @@ export async function recordGameSession(sessionData: GameSessionData): Promise<b
 
     const result = await response.json();
     console.log('Game session recorded successfully:', result);
+    
+    // Also update global leaderboard
+    try {
+      const globalResponse = await fetch('/api/user/game-result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          points: sessionData.points,
+          gameId: sessionData.gameId
+        }),
+      });
+      
+      if (globalResponse.ok) {
+        console.log('Global leaderboard updated successfully');
+      }
+    } catch (globalError) {
+      console.warn('Failed to update global leaderboard:', globalError);
+    }
+    
     return true;
   } catch (error) {
     console.error('Error recording game session:', error);

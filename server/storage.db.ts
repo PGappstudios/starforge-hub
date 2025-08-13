@@ -115,23 +115,23 @@ export class DatabaseStorage {
     // Calculate user's total by summing their BEST score from each game (1-6)
     let calculatedTotal = 0;
     let totalGamesPlayed = 0;
-    
+
     for (let gameId = 1; gameId <= 6; gameId++) {
       const gameTable = this.getGameTable(gameId);
-      
+
       // Get user's best score from this specific game
       const userGameScores = await db
         .select()
         .from(gameTable)
         .where(eq(gameTable.userId, userId));
-      
+
       if (userGameScores.length > 0) {
         const bestScore = Math.max(...userGameScores.map((entry) => entry.score));
         calculatedTotal += bestScore;
         totalGamesPlayed += userGameScores.length;
       }
     }
-    
+
     console.log(`Global leaderboard calculation for user ${userId}: Total = ${calculatedTotal} (from ${totalGamesPlayed} total game sessions across all games)`);
 
     // Update global leaderboard entry
@@ -355,13 +355,13 @@ export class DatabaseStorage {
   async resetUserGameData(userId: number): Promise<void> {
     // Delete from global leaderboard
     await db.delete(globalLeaderboards).where(eq(globalLeaderboards.userId, userId));
-    
+
     // Delete from all individual game leaderboards
     for (let gameId = 1; gameId <= 6; gameId++) {
       const gameTable = this.getGameTable(gameId);
       await db.delete(gameTable).where(eq(gameTable.userId, userId));
     }
-    
+
     // Reset user's total points and games played
     await db
       .update(users)
@@ -371,7 +371,7 @@ export class DatabaseStorage {
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
-    
+
     console.log(`Reset all game data for user ${userId}`);
   }
 
@@ -404,6 +404,3 @@ export class DatabaseStorage {
 }
 
 export { GAMES_CONFIG };
-
-
-

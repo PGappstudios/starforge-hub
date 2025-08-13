@@ -23,6 +23,7 @@ export interface IStorage {
   >;
   addGameLeaderboardEntry(gameId: number, userId: number, score: number): Promise<any>;
   getIndividualGameLeaderboard(gameId: number, type: "monthly" | "yearly", limit: number): Promise<any[]>;
+  resetUserGameData(userId: number): Promise<void>;
 }
 
 const hasDatabaseUrl = !!process.env.DATABASE_URL && process.env.DATABASE_URL.trim().length > 0;
@@ -65,4 +66,5 @@ export const storage = {
   async getUserGameBreakdown(userId: number) { return (await getStorage()).getUserGameBreakdown(userId); },
   async addGameLeaderboardEntry(gameId: number, userId: number, score: number) { return (await getStorage()).addGameLeaderboardEntry(gameId, userId, score); },
   async getIndividualGameLeaderboard(gameId: number, type: "monthly" | "yearly", limit: number) { return (await getStorage()).getIndividualGameLeaderboard(gameId, type, limit); },
+  async resetUserGameData(userId: number) { return (await getStorage()).resetUserGameData(userId); },
 } as IStorage;

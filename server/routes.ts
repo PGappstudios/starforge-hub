@@ -340,16 +340,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid game ID. Must be between 1 and 6" });
       }
 
-      // Record to individual game leaderboard (this will handle both game and global leaderboards)
+      // Record to individual game leaderboard
       await storage.addGameLeaderboardEntry(gameId, req.session.userId, score);
+      
+      // Update global leaderboard
+      await storage.updateGlobalLeaderboard(req.session.userId, points);
 
-      console.log(`Game score recorded: User ${req.session.userId}, Game ${gameId}, Score ${score}`);
+      console.log(`Game score recorded: User ${req.session.userId}, Game ${gameId}, Score ${score}, Points ${points}`);
       
       res.json({ 
         success: true, 
         message: "Score recorded successfully",
         gameId,
-        score
+        score,
+        points
       });
     } catch (error) {
       console.error("Record game score error:", error);
