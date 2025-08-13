@@ -275,7 +275,8 @@ const Credits = () => {
                         </Button>
                       </CardContent>
                     </Card>
-                    ))
+                      ))
+                    }
                   </div>
                 )}
               </div>
