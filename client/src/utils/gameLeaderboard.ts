@@ -48,8 +48,16 @@ export const GAMES_CONFIG = {
   6: { name: "Resource Runner", description: "Collect resources while avoiding obstacles" }
 } as const;
 
-// Note: Previously calculated points with multipliers, now removed entirely.
-// All games now use a 1:1 score-to-points ratio.
+/**
+ * Calculate points from score based on game type
+ * For now, all games use 1:1 ratio, but this function exists
+ * for potential future multipliers or different scoring systems
+ */
+export function calculatePointsFromScore(score: number, gameId: number): number {
+  // For now, simple 1:1 ratio for all games
+  // Future enhancement: could add game-specific multipliers here
+  return score;
+}
 
 /**
  * Record a game session and update all leaderboards
