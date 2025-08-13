@@ -1,0 +1,326 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Star Seekers Cosmic Theme */
+@layer base {
+  :root {
+    --background: 220 30% 5%;
+    --foreground: 220 9% 95%;
+
+    --card: 220 25% 8%;
+    --card-foreground: 220 9% 95%;
+
+    --popover: 220 25% 8%;
+    --popover-foreground: 220 9% 95%;
+
+    --primary: 195 100% 60%;
+    --primary-foreground: 220 30% 5%;
+
+    --secondary: 280 100% 75%;
+    --secondary-foreground: 220 30% 5%;
+
+    --muted: 220 18% 12%;
+    --muted-foreground: 220 9% 65%;
+
+    --accent: 320 100% 65%;
+    --accent-foreground: 220 30% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 18% 18%;
+    --input: 220 18% 18%;
+    --ring: 195 100% 60%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground min-h-screen;
+    font-family: 'Exo 2', sans-serif;
+    background: transparent;
+  }
+
+  .cosmic-bg {
+    background-image: url('/discovery-of-iris.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    position: relative;
+  }
+
+  .cosmic-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(64, 224, 208, 0.1) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(10, 10, 10, 0.4) 0%, rgba(26, 10, 46, 0.3) 25%, rgba(22, 33, 62, 0.2) 50%, rgba(26, 10, 46, 0.3) 75%, rgba(10, 10, 10, 0.4) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .cosmic-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
+      radial-gradient(1px 1px at 40px 70px, rgba(120, 119, 198, 0.9), transparent),
+      radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255, 119, 198, 0.8), transparent),
+      radial-gradient(1px 1px at 160px 30px, rgba(120, 119, 198, 0.6), transparent),
+      radial-gradient(1px 1px at 200px 120px, rgba(64, 224, 208, 0.7), transparent),
+      radial-gradient(1px 1px at 250px 50px, #ffffff, transparent),
+      radial-gradient(1px 1px at 300px 150px, rgba(255, 119, 198, 0.5), transparent),
+      radial-gradient(1px 1px at 350px 80px, rgba(120, 119, 198, 0.4), transparent),
+      radial-gradient(1px 1px at 400px 200px, rgba(64, 224, 208, 0.6), transparent);
+    background-repeat: repeat;
+    background-size: 400px 200px;
+    animation: twinkle 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .cosmic-bg > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  .stars-bg {
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
+      radial-gradient(1px 1px at 40px 70px, rgba(120, 119, 198, 0.9), transparent),
+      radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255, 119, 198, 0.8), transparent),
+      radial-gradient(1px 1px at 160px 30px, rgba(120, 119, 198, 0.6), transparent),
+      radial-gradient(1px 1px at 200px 120px, rgba(64, 224, 208, 0.7), transparent),
+      radial-gradient(1px 1px at 250px 50px, #ffffff, transparent),
+      radial-gradient(1px 1px at 300px 150px, rgba(255, 119, 198, 0.5), transparent),
+      radial-gradient(1px 1px at 350px 80px, rgba(120, 119, 198, 0.4), transparent),
+      radial-gradient(1px 1px at 400px 200px, rgba(64, 224, 208, 0.6), transparent);
+    background-repeat: repeat;
+    background-size: 400px 200px;
+    animation: twinkle 20s linear infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .neon-glow {
+    box-shadow: 
+      0 0 5px hsl(195 100% 60%),
+      0 0 10px hsl(195 100% 60%),
+      0 0 15px hsl(195 100% 60%),
+      0 0 20px hsl(195 100% 60%);
+  }
+
+  .neon-text {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+
+  .neon-text-soft {
+    text-shadow:
+      0 0 3px currentColor,
+      0 0 6px currentColor,
+      0 0 10px currentColor;
+  }
+
+  .text-outline {
+    text-shadow: 
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 0 10px rgba(255,255,255,0.8);
+  }
+}
+
+@layer utilities {
+  .font-futuristic {
+    font-family: 'Orbitron', monospace;
+  }
+  
+  .text-stroke-white {
+    -webkit-text-stroke: 1.25px rgba(255, 255, 255, 0.9);
+    text-stroke: 1.25px rgba(255, 255, 255, 0.9);
+    paint-order: stroke fill;
+  }
+
+  .text-stroke-purple {
+    -webkit-text-stroke: 1.25px rgba(168, 85, 247, 0.95);
+    text-stroke: 1.25px rgba(168, 85, 247, 0.95);
+    paint-order: stroke fill;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite alternate;
+  }
+
+  .animate-space-drift {
+    animation: spaceDrift 15s linear infinite;
+  }
+
+  /* 3D Card Flip Animation Classes */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .duration-300 {
+    transition-duration: 300ms;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px hsl(195 100% 60%), 0 0 10px hsl(195 100% 60%);
+  }
+  100% {
+    box-shadow: 0 0 20px hsl(195 100% 60%), 0 0 30px hsl(195 100% 60%);
+  }
+}
+
+@keyframes spaceDrift {
+  0% {
+    transform: translateX(0px) translateY(0px);
+  }
+  25% {
+    transform: translateX(10px) translateY(-5px);
+  }
+  50% {
+    transform: translateX(0px) translateY(-10px);
+  }
+  75% {
+    transform: translateX(-10px) translateY(-5px);
+  }
+  100% {
+    transform: translateX(0px) translateY(0px);
+  }
+}
+
+@layer components {
+  .faction-card {
+    @apply bg-black/20 backdrop-blur-md border border-white/20 rounded-lg p-6 transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105;
+  }
+  
+  .game-card {
+    @apply bg-black/20 backdrop-blur-md border border-white/20 rounded-xl p-6 transition-all duration-300 hover:bg-black/30 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/20 hover:scale-105;
+  }
+  
+  .nav-button {
+    @apply bg-primary/20 hover:bg-primary/40 text-primary border border-primary/40 hover:border-primary/60 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-md hover:shadow-primary/30 hover:scale-105;
+  }
+
+  .space-card {
+    @apply bg-black/20 backdrop-blur-lg border border-purple-500/25 rounded-xl p-6 transition-all duration-500 hover:bg-black/30 hover:border-purple-400/50 hover:shadow-2xl hover:shadow-purple-500/20;
+  }
+
+  /* Cosmic Toast Notifications */
+  .cosmic-toast-success {
+    @apply backdrop-blur-md rounded-lg shadow-lg shadow-green-500/20 border-2;
+    animation: toastSlideIn 0.3s ease-out;
+  }
+
+  .cosmic-toast-info {
+    @apply backdrop-blur-md rounded-lg shadow-lg shadow-blue-500/20 border-2;
+    animation: toastSlideIn 0.3s ease-out;
+  }
+
+  .cosmic-toast-warning {
+    @apply backdrop-blur-md rounded-lg shadow-lg shadow-yellow-500/20 border-2;
+    animation: toastSlideIn 0.3s ease-out;
+  }
+
+  .cosmic-toast-purchase {
+    @apply backdrop-blur-md rounded-lg shadow-lg shadow-purple-500/20 border-2;
+    animation: toastSlideIn 0.3s ease-out, toastGlow 2s ease-in-out;
+  }
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toastGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3);
+  }
+}

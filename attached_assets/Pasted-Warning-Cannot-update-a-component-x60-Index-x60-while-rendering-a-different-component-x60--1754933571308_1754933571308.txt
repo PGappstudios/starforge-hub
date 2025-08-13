@@ -1,0 +1,16 @@
+Warning: Cannot update a component (&#x60;Index&#x60;) while rendering a different component (&#x60;VideoIntro&#x60;). To locate the bad setState() call inside &#x60;VideoIntro&#x60;, follow the stack trace as described in https://reactjs.org/link/setstate-in-render
+    at VideoIntro (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/components/VideoIntro.tsx:22:23)
+    at div
+    at Index (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/pages/Index.tsx:29:20)
+    at RenderedRoute (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=6708ffba:5643:26)
+    at Routes (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=6708ffba:6379:3)
+    at Router (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=6708ffba:6322:13)
+    at BrowserRouter (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=6708ffba:9403:3)
+    at Provider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=6708ffba:38:15)
+    at TooltipProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=6708ffba:61:5)
+    at CreditNotificationProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/App.tsx?v=i1rPLgihut0kPscH9_7bP:43:39)
+    at CreditsProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/contexts/CreditsContext.tsx:22:35)
+    at SettingsProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/contexts/SettingsContext.tsx:29:36)
+    at AuthProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/src/contexts/AuthContext.tsx:29:32)
+    at QueryClientProvider (https://0c6cbd9d-00f9-466e-9ea8-d7b090e6d66c-00-1kvgl3ypmmbm6.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=6708ffba:2805:3)
+    at App
