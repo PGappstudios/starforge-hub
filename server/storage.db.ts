@@ -123,11 +123,9 @@ export class DatabaseStorage {
       const userGameScores = await db
         .select()
         .from(gameTable)
-        // @ts-expect-error drizzle typed columns generic
         .where(eq(gameTable.userId, userId));
       
       if (userGameScores.length > 0) {
-        // @ts-expect-error drizzle typed columns generic
         const bestScore = Math.max(...userGameScores.map((entry) => entry.score));
         calculatedTotal += bestScore;
         totalGamesPlayed += userGameScores.length;
@@ -208,7 +206,6 @@ export class DatabaseStorage {
   async resetMonthlyLeaderboards(): Promise<void> {
     for (let gameId = 1; gameId <= 6; gameId++) {
       const gameTable = this.getGameTable(gameId);
-      // @ts-expect-error drizzle typed columns generic
       await db.delete(gameTable).where(eq(gameTable.leaderboardType, "monthly"));
     }
   }
@@ -216,7 +213,6 @@ export class DatabaseStorage {
   async resetYearlyLeaderboards(): Promise<void> {
     for (let gameId = 1; gameId <= 6; gameId++) {
       const gameTable = this.getGameTable(gameId);
-      // @ts-expect-error drizzle typed columns generic
       await db.delete(gameTable).where(eq(gameTable.leaderboardType, "yearly"));
     }
   }
@@ -281,11 +277,9 @@ export class DatabaseStorage {
       const sessions = await db
         .select()
         .from(gameTable)
-        // @ts-expect-error generic
         .where(eq(gameTable.userId, userId));
 
       if (sessions.length > 0) {
-        // @ts-expect-error generic
         const bestScore = Math.max(...sessions.map((s) => s.score));
         // Dashboard should show best score, not sum of all sessions
         breakdown[gameId] = {
@@ -351,9 +345,7 @@ export class DatabaseStorage {
     const results = await db
       .select()
       .from(gameTable)
-      // @ts-expect-error generic
       .where(eq(gameTable.leaderboardType, type))
-      // @ts-expect-error generic
       .orderBy(desc(gameTable.score))
       .limit(limit);
     return results;
@@ -367,7 +359,6 @@ export class DatabaseStorage {
     // Delete from all individual game leaderboards
     for (let gameId = 1; gameId <= 6; gameId++) {
       const gameTable = this.getGameTable(gameId);
-      // @ts-expect-error drizzle typed columns generic
       await db.delete(gameTable).where(eq(gameTable.userId, userId));
     }
     

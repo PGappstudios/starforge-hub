@@ -28,13 +28,41 @@ export interface IStorage {
 const hasDatabaseUrl = !!process.env.DATABASE_URL && process.env.DATABASE_URL.trim().length > 0;
 
 // Lazy-resolve storage to avoid importing DB layer when DATABASE_URL is not set
-let resolvedStorage: IStorage;
-if (hasDatabaseUrl) {
-  const mod = await import("./storage.db.ts");
-  resolvedStorage = new mod.DatabaseStorage();
-} else {
-  const mod = await import("./storage.memory.ts");
-  resolvedStorage = new mod.MemoryStorage();
+let storageInstance: IStorage | null = null;
+
+export async function getStorage(): Promise<IStorage> {
+  if (storageInstance) return storageInstance;
+  
+  if (hasDatabaseUrl) {
+    const mod = await import("./storage.db.ts");
+    storageInstance = new mod.DatabaseStorage();
+  } else {
+    const mod = await import("./storage.memory.ts");
+    storageInstance = new mod.MemoryStorage();
+  }
+  
+  return storageInstance;
 }
 
-export const storage: IStorage = resolvedStorage;
+// For backwards compatibility
+export const storage = {
+  async getUser(id: number) { return (await getStorage()).getUser(id); },
+  async getUserByUsername(username: string) { return (await getStorage()).getUserByUsername(username); },
+  async getUserByEmail(email: string) { return (await getStorage()).getUserByEmail(email); },
+  async createUser(user: { username: string; email: string; password: string }) { return (await getStorage()).createUser(user); },
+  async updateUserProfile(id: number, profile: any) { return (await getStorage()).updateUserProfile(id, profile); },
+  async updateUserCredits(userId: number, credits: number) { return (await getStorage()).updateUserCredits(userId, credits); },
+  async addUserCredits(userId: number, amount: number) { return (await getStorage()).addUserCredits(userId, amount); },
+  async spendUserCredits(userId: number, amount: number) { return (await getStorage()).spendUserCredits(userId, amount); },
+  async getGlobalLeaderboard(limit?: number) { return (await getStorage()).getGlobalLeaderboard(limit); },
+  async updateGlobalLeaderboard(userId: number, points: number) { return (await getStorage()).updateGlobalLeaderboard(userId, points); },
+  async getUserLeaderboardPosition(userId: number, gameId?: number, type?: "monthly" | "yearly") { return (await getStorage()).getUserLeaderboardPosition(userId, gameId, type); },
+  async resetMonthlyLeaderboards() { return (await getStorage()).resetMonthlyLeaderboards(); },
+  async resetYearlyLeaderboards() { return (await getStorage()).resetYearlyLeaderboards(); },
+  async updateGameResult(userId: number, points: number) { return (await getStorage()).updateGameResult(userId, points); },
+  async getAllUsersForLeaderboard() { return (await getStorage()).getAllUsersForLeaderboard(); },
+  getCurrentPeriod(type: "monthly" | "yearly") { throw new Error("getCurrentPeriod must be called directly on storage instance"); },
+  async getUserGameBreakdown(userId: number) { return (await getStorage()).getUserGameBreakdown(userId); },
+  async addGameLeaderboardEntry(gameId: number, userId: number, score: number) { return (await getStorage()).addGameLeaderboardEntry(gameId, userId, score); },
+  async getIndividualGameLeaderboard(gameId: number, type: "monthly" | "yearly", limit: number) { return (await getStorage()).getIndividualGameLeaderboard(gameId, type, limit); },
+} as IStorage;

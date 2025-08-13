@@ -252,18 +252,38 @@ export const insertGame6LeaderboardSchema = createInsertSchema(game6Leaderboard)
   updatedAt: true 
 });
 
-// Insert types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-// Removed: InsertGameLeaderboard type - now using individual game types
-export type InsertGlobalLeaderboard = z.infer<typeof insertGlobalLeaderboardSchema>;
-// Removed: InsertGameSession type - game sessions table removed
-// Removed: InsertUserRegistration type - registration table removed
-export type InsertGame1Leaderboard = z.infer<typeof insertGame1LeaderboardSchema>;
-export type InsertGame2Leaderboard = z.infer<typeof insertGame2LeaderboardSchema>;
-export type InsertGame3Leaderboard = z.infer<typeof insertGame3LeaderboardSchema>;
-export type InsertGame4Leaderboard = z.infer<typeof insertGame4LeaderboardSchema>;
-export type InsertGame5Leaderboard = z.infer<typeof insertGame5LeaderboardSchema>;
-export type InsertGame6Leaderboard = z.infer<typeof insertGame6LeaderboardSchema>;
+// Insert types - manually define for better compatibility
+export type InsertUser = {
+  username: string;
+  password: string;
+  email: string;
+  solanaWallet?: string | null;
+  faction?: "oni" | "mud" | "ustur" | null;
+};
+
+export type InsertGlobalLeaderboard = {
+  userId: number;
+  totalPoints: number;
+  rank: number;
+  lastUpdated?: Date;
+};
+
+export type InsertGame1Leaderboard = {
+  userId: number;
+  username: string;
+  score: number;
+  points: number;
+  playedAt?: Date;
+  leaderboardType: "monthly" | "yearly";
+  periodStart: Date;
+  periodEnd: Date;
+};
+
+export type InsertGame2Leaderboard = InsertGame1Leaderboard;
+export type InsertGame3Leaderboard = InsertGame1Leaderboard;
+export type InsertGame4Leaderboard = InsertGame1Leaderboard;
+export type InsertGame5Leaderboard = InsertGame1Leaderboard;
+export type InsertGame6Leaderboard = InsertGame1Leaderboard;
 
 // Select types
 export type User = typeof users.$inferSelect;
