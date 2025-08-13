@@ -212,7 +212,7 @@ const Credits = () => {
                 {!loadingPackages && (
                   <div className="grid md:grid-cols-2 gap-6">
                     {availablePackages
-                      .filter((pkg) => pkg.id !== 'pro' && !/\bpro\b/i.test(pkg.name || ''))
+                      .filter((pkg) => pkg.id !== 'pro' && !(pkg.name || '').toLowerCase().includes('pro'))
                       .map((pkg) => (
                     <Card 
                       key={pkg.id} 
