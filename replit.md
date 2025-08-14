@@ -96,6 +96,13 @@ All data is persistently stored in a PostgreSQL database using Neon serverless. 
 
 ## Recent Changes
 
+### 2025-08-14: Deployment Fix - Build Directory Structure
+- **Build Process Fix**: Created custom build script to resolve deployment issues
+- **Directory Structure**: Fixed mismatch between vite build output (client/dist) and server expectations (dist/public)
+- **Custom Build Script**: Added build.js script that properly copies client files to expected directory structure
+- **Deployment Ready**: Application now builds correctly with static files in the expected dist/public directory
+- **Server Compatibility**: Maintains compatibility with existing server configuration without breaking Vite setup
+
 ### 2025-08-14: Real Stripe Payment Integration with Price IDs
 - **Complete Stripe Overhaul**: Implemented real Stripe Payment Intents API using Price IDs
 - **Customer Management**: Added stripeCustomerId field to users table for proper Stripe integration
