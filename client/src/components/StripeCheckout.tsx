@@ -27,11 +27,40 @@ const CheckoutForm = ({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps
   const [loading, setLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const [authChecked, setAuthChecked] = useState(false);
+  const { user, isLoading: authLoading } = useAuth();
   const { addCredits } = useCredits();
 
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user', { credentials: 'include' });
+        setAuthChecked(true);
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('Auth check success:', userData);
+        } else {
+          console.log('Auth check failed:', response.status);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setAuthChecked(true);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
   const handlePayment = async () => {
-    if (!user) {
+    // Double-check authentication
+    try {
+      const authResponse = await fetch('/api/user', { credentials: 'include' });
+      if (!authResponse.ok) {
+        setError('Please log in to purchase credits');
+        return;
+      }
+    } catch (error) {
       setError('Please log in to purchase credits');
       return;
     }

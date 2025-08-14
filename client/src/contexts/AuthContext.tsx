@@ -93,7 +93,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
       
       if (response.ok) {
-        const userData = await response.json();
+        const data = await response.json();
+        // Handle both response formats: {user: {...}} and {...}
+        const userData = data.user || data;
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(userData));
