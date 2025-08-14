@@ -24,6 +24,18 @@ export interface IStorage {
   addGameLeaderboardEntry(gameId: number, userId: number, score: number): Promise<any>;
   getIndividualGameLeaderboard(gameId: number, type: "monthly" | "yearly", limit: number): Promise<any[]>;
   resetUserGameData(userId: number): Promise<void>;
+  // Payment methods
+  createPayment(paymentData: {
+    userId: number;
+    stripePaymentIntentId?: string;
+    packageId: string;
+    packageName: string;
+    amount: number;
+    credits: number;
+    currency?: string;
+  }): Promise<any>;
+  updatePaymentStatus(paymentIntentId: string, status: 'succeeded' | 'failed' | 'refunded'): Promise<any>;
+  getPaymentHistory(userId: number): Promise<any[]>;
 }
 
 const hasDatabaseUrl = !!process.env.DATABASE_URL && process.env.DATABASE_URL.trim().length > 0;
@@ -67,4 +79,16 @@ export const storage = {
   async addGameLeaderboardEntry(gameId: number, userId: number, score: number) { return (await getStorage()).addGameLeaderboardEntry(gameId, userId, score); },
   async getIndividualGameLeaderboard(gameId: number, type: "monthly" | "yearly", limit: number) { return (await getStorage()).getIndividualGameLeaderboard(gameId, type, limit); },
   async resetUserGameData(userId: number) { return (await getStorage()).resetUserGameData(userId); },
+  // Payment methods
+  async createPayment(paymentData: {
+    userId: number;
+    stripePaymentIntentId?: string;
+    packageId: string;
+    packageName: string;
+    amount: number;
+    credits: number;
+    currency?: string;
+  }) { return (await getStorage()).createPayment(paymentData); },
+  async updatePaymentStatus(paymentIntentId: string, status: 'succeeded' | 'failed' | 'refunded') { return (await getStorage()).updatePaymentStatus(paymentIntentId, status); },
+  async getPaymentHistory(userId: number) { return (await getStorage()).getPaymentHistory(userId); },
 } as IStorage;

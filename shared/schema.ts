@@ -6,6 +6,7 @@ import { z } from "zod";
 // Enums
 export const factionEnum = pgEnum('faction', ['oni', 'mud', 'ustur']);
 export const leaderboardTypeEnum = pgEnum('leaderboard_type', ['monthly', 'yearly']);
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'succeeded', 'failed', 'refunded']);
 
 // Users table
 export const users = pgTable('users', {
@@ -39,6 +40,21 @@ export const globalLeaderboards = pgTable('global_leaderboards', {
 // Removed: Game sessions table - session tracking not needed
 
 // Removed: userRegistrations table - simplified to direct user creation
+
+// Payment tracking table for Stripe transactions
+export const payments = pgTable('payments', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  stripePaymentIntentId: varchar('stripe_payment_intent_id', { length: 255 }).unique(),
+  packageId: varchar('package_id', { length: 50 }).notNull(),
+  packageName: varchar('package_name', { length: 255 }).notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(), // Dollar amount
+  credits: integer('credits').notNull(),
+  status: paymentStatusEnum('status').notNull().default('pending'),
+  currency: varchar('currency', { length: 3 }).notNull().default('usd'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
 
 // Individual game leaderboard tables
 export const game1Leaderboard = pgTable("game1_leaderboard", {
@@ -134,6 +150,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   game4Leaderboard: many(game4Leaderboard),
   game5Leaderboard: many(game5Leaderboard),
   game6Leaderboard: many(game6Leaderboard),
+  payments: many(payments),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  user: one(users, {
+    fields: [payments.userId],
+    references: [users.id],
+  }),
 }));
 
 // Removed: gameLeaderboardsRelations - replaced with individual game relations
@@ -206,6 +230,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 
 export const insertGlobalLeaderboardSchema = createInsertSchema(globalLeaderboards).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({ 
   id: true, 
   createdAt: true, 
   updatedAt: true 

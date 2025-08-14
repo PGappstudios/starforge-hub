@@ -80,9 +80,9 @@ export class MemoryStorage {
       gamesPlayed: 0,
       achievements: 0,
       credits: 10,
-      createdAt: now,
-      updatedAt: now,
-    } as unknown as User; // cast to satisfy type shape; matches fields used by client
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
     this.users.set(user.id, user);
     this.usersByEmail.set(user.email as string, user.id);
@@ -93,7 +93,7 @@ export class MemoryStorage {
   async updateUserProfile(userId: number, profileData: UpdateUserProfile): Promise<User | undefined> {
     const user = this.users.get(userId);
     if (!user) return undefined;
-    const updated = { ...user, ...profileData, updatedAt: new Date().toISOString() } as User;
+    const updated = { ...user, ...profileData, updatedAt: new Date() };
     this.users.set(userId, updated);
     return updated;
   }
@@ -101,7 +101,7 @@ export class MemoryStorage {
   async updateUserCredits(userId: number, credits: number): Promise<User | undefined> {
     const user = this.users.get(userId);
     if (!user) return undefined;
-    const updated = { ...user, credits, updatedAt: new Date().toISOString() } as User;
+    const updated = { ...user, credits, updatedAt: new Date() };
     this.users.set(userId, updated);
     return updated;
   }
@@ -293,7 +293,11 @@ export class MemoryStorage {
   // Reset all game data for a specific user
   async resetUserGameData(userId: number): Promise<void> {
     // Remove user from global leaderboard
-    this.globalLeaderboard = this.globalLeaderboard.filter(entry => entry.userId !== userId);
+    this.global.forEach((entry, key) => {
+      if (entry.userId === userId) {
+        this.global.delete(key);
+      }
+    });
     
     // Remove user from all individual game leaderboards
     for (let gameId = 1; gameId <= 6; gameId++) {
@@ -345,6 +349,33 @@ export class MemoryStorage {
     }
 
     return Object.values(breakdown);
+  }
+
+  // Payment methods (stub implementation for memory storage)
+  async createPayment(paymentData: {
+    userId: number;
+    stripePaymentIntentId?: string;
+    packageId: string;
+    packageName: string;
+    amount: number;
+    credits: number;
+    currency?: string;
+  }): Promise<any> {
+    return {
+      id: Date.now(),
+      ...paymentData,
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  async updatePaymentStatus(paymentIntentId: string, status: 'succeeded' | 'failed' | 'refunded'): Promise<any> {
+    return { success: true, status };
+  }
+
+  async getPaymentHistory(userId: number): Promise<any[]> {
+    return []; // Return empty for memory storage
   }
 }
 

@@ -7,6 +7,7 @@ import {
   game4Leaderboard,
   game5Leaderboard,
   game6Leaderboard,
+  payments,
   type User,
   type InsertUser,
   type UpdateUserProfile,
@@ -395,6 +396,61 @@ export class DatabaseStorage {
       .where(eq(users.id, userId));
 
     console.log(`Reset all game data for user ${userId}`);
+  }
+
+  // Payment tracking methods
+  async createPayment(paymentData: {
+    userId: number;
+    stripePaymentIntentId?: string;
+    packageId: string;
+    packageName: string;
+    amount: number;
+    credits: number;
+    currency?: string;
+  }): Promise<any> {
+    const [payment] = await db.insert(payments).values({
+      userId: paymentData.userId,
+      stripePaymentIntentId: paymentData.stripePaymentIntentId,
+      packageId: paymentData.packageId,
+      packageName: paymentData.packageName,
+      amount: paymentData.amount.toString(), // Convert to string for numeric field
+      credits: paymentData.credits,
+      currency: paymentData.currency || 'usd',
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return payment;
+  }
+
+  async updatePaymentStatus(paymentIntentId: string, status: 'succeeded' | 'failed' | 'refunded'): Promise<any> {
+    const [payment] = await db
+      .update(payments)
+      .set({ 
+        status, 
+        updatedAt: new Date() 
+      })
+      .where(eq(payments.stripePaymentIntentId, paymentIntentId))
+      .returning();
+    return payment;
+  }
+
+  async getPaymentHistory(userId: number): Promise<any[]> {
+    const userPayments = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.userId, userId))
+      .orderBy(desc(payments.createdAt));
+    
+    return userPayments.map(payment => ({
+      id: payment.id.toString(),
+      packageName: payment.packageName,
+      amount: parseFloat(payment.amount),
+      credits: payment.credits,
+      status: payment.status,
+      date: payment.createdAt.toLocaleDateString(),
+      stripePaymentId: payment.stripePaymentIntentId,
+    }));
   }
 
   private getGameTable(

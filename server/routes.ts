@@ -491,7 +491,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         periodEnd: end
       };
 
-      await storage.addGameLeaderboardEntry(gameId, leaderboardEntry);
+      await storage.addGameLeaderboardEntry(gameId, req.session.userId, score);
       
       // Update global leaderboard
       await storage.updateGlobalLeaderboard(req.session.userId, points);
@@ -590,6 +590,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // For test mode, simulate successful payment
       if (process.env.NODE_ENV === 'development') {
+        // Create payment record
+        const payment = await storage.createPayment({
+          userId: req.session.userId,
+          stripePaymentIntentId: `pi_test_${Date.now()}`,
+          packageId,
+          packageName: pkg.name,
+          amount: pkg.price,
+          credits: expectedCredits,
+          currency
+        });
+
+        // Update payment status to succeeded for test mode
+        await storage.updatePaymentStatus(payment.stripePaymentIntentId, 'succeeded');
+        
         // Add credits immediately in test mode
         const totalCredits = getTotalCredits(packageId);
         await storage.addUserCredits(req.session.userId, totalCredits);
@@ -719,13 +733,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // In production, you would query Stripe for payment history
-      // For now, return mock data or implement database storage
-      const paymentHistory = [
-        // This would be populated from actual Stripe payment history
-        // or from a local database table tracking payments
-      ];
-
+      // Get payment history from database
+      const paymentHistory = await storage.getPaymentHistory(req.session.userId);
       res.json(paymentHistory);
     } catch (error: any) {
       console.error('Get payment history error:', error);
