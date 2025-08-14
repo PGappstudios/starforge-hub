@@ -27,7 +27,7 @@ export const CREDIT_PACKAGES = {
     id: 'gamer', 
     name: 'Gamer Pack',
     credits: 250,
-    bonus: 50,
+    bonus: 0,
     price: 9.99,
     stripePriceId: process.env.STRIPE_GAMER_PRICE_ID || 'price_gamer', // Set actual price ID in env
     popular: true,

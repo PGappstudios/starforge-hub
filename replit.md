@@ -96,6 +96,17 @@ All data is persistently stored in a PostgreSQL database using Neon serverless. 
 
 ## Recent Changes
 
+### 2025-08-14: Real Stripe Payment Integration with Price IDs
+- **Complete Stripe Overhaul**: Implemented real Stripe Payment Intents API using Price IDs
+- **Customer Management**: Added stripeCustomerId field to users table for proper Stripe integration
+- **Simplified Payment API**: Now only requires packageId, automatic price/credits calculation
+- **Database Schema Update**: Added stripe_customer_id column to PostgreSQL users table
+- **Payment Tracking**: All transactions properly stored with complete audit trail
+- **Credit Package Adjustment**: Fixed Gamer Pack to provide exactly 250 credits (removed 50 bonus)
+- **Test Mode Validation**: Confirmed both Starter Pack (100 credits) and Gamer Pack (250 credits) working perfectly
+- **Frontend Integration**: Updated StripeCheckout component to work with simplified backend API
+- **Environment Support**: Ready for production with real Stripe Price IDs when environment variables set
+
 ### 2025-08-13: PostgreSQL Database Fully Operational
 - **Database Integration Complete**: Successfully integrated PostgreSQL database using Neon serverless
 - **All Tables Created**: Users, global_leaderboards, and individual game leaderboard tables (game1-game6)
