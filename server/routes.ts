@@ -571,6 +571,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // For test mode, simulate successful payment
       if (process.env.NODE_ENV === 'development') {
+        console.log(`Creating test payment for user ${req.session.userId}, package ${packageId}, credits ${expectedCredits}`);
+        
         // Create payment record
         const payment = await storage.createPayment({
           userId: req.session.userId,
@@ -587,6 +589,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Add credits immediately in test mode
         await storage.addUserCredits(req.session.userId, expectedCredits);
+        
+        console.log(`Test payment successful - added ${expectedCredits} credits to user ${req.session.userId}`);
         
         return res.json({
           success: true,
@@ -636,7 +640,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         priceId: pkg.stripePriceId,
       });
     } catch (error: any) {
-      console.error('Create payment intent error:', error);
+      console.error('Create payment intent error:', {
+        message: error.message,
+        stack: error.stack,
+        userId: req.session.userId,
+        packageId: req.body.packageId
+      });
       
       // Handle validation errors
       if (error.name === 'ZodError') {
