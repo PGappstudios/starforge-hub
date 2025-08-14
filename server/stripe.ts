@@ -12,7 +12,7 @@ export const stripe = new Stripe(stripeSecretKey, {
   typescript: true,
 });
 
-// Credit packages configuration
+// Credit packages configuration with Stripe Price IDs
 export const CREDIT_PACKAGES = {
   starter: {
     id: 'starter',
@@ -20,6 +20,7 @@ export const CREDIT_PACKAGES = {
     credits: 100,
     bonus: 0,
     price: 4.99,
+    stripePriceId: process.env.STRIPE_STARTER_PRICE_ID || 'price_starter', // Set actual price ID in env
     popular: false,
   },
   gamer: {
@@ -28,6 +29,7 @@ export const CREDIT_PACKAGES = {
     credits: 250,
     bonus: 50,
     price: 9.99,
+    stripePriceId: process.env.STRIPE_GAMER_PRICE_ID || 'price_gamer', // Set actual price ID in env
     popular: true,
   },
   pro: {
@@ -36,6 +38,7 @@ export const CREDIT_PACKAGES = {
     credits: 500,
     bonus: 150,
     price: 19.99,
+    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro', // Set actual price ID in env
     popular: false,
   },
 } as const;

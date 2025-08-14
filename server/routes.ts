@@ -23,11 +23,9 @@ const updateUserProfileSchema = z.object({
   credits: z.number().int().min(0).optional(),
 });
 
-// Stripe payment validation schema
+// Stripe payment validation schema - simplified for Price ID based payments
 const createPaymentIntentSchema = z.object({
   packageId: z.string().min(1),
-  amount: z.number().int().min(100), // Minimum $1.00
-  credits: z.number().int().min(1),
   currency: z.string().optional().default('usd'),
 });
 
@@ -551,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate input data
       const validatedData = createPaymentIntentSchema.parse(req.body);
-      const { packageId, amount, credits, currency } = validatedData;
+      const { packageId, currency } = validatedData;
       
       // Validate package
       const pkg = getPackageById(packageId);
@@ -559,24 +557,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid package ID" });
       }
 
-      // Validate amount matches package price
-      if (amount !== Math.round(pkg.price * 100)) {
-        return res.status(400).json({ 
-          message: "Invalid amount", 
-          expected: Math.round(pkg.price * 100),
-          received: amount 
-        });
-      }
-
-      // Validate credits match package
       const expectedCredits = pkg.credits + pkg.bonus;
-      if (credits !== expectedCredits) {
-        return res.status(400).json({ 
-          message: "Invalid credits amount",
-          expected: expectedCredits,
-          received: credits 
-        });
-      }
 
       // Rate limiting check (simple implementation)
       const rateLimitKey = `payment_attempts_${req.session.userId}`;
@@ -605,37 +586,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updatePaymentStatus(payment.stripePaymentIntentId, 'succeeded');
         
         // Add credits immediately in test mode
-        const totalCredits = getTotalCredits(packageId);
-        await storage.addUserCredits(req.session.userId, totalCredits);
+        await storage.addUserCredits(req.session.userId, expectedCredits);
         
         return res.json({
           success: true,
           clientSecret: 'test_client_secret',
           packageId,
-          credits: totalCredits,
-          amount,
+          credits: expectedCredits,
+          amount: Math.round(pkg.price * 100),
           testMode: true
         });
       }
 
-      // Create payment intent with Stripe
+      // Real Stripe payment using the imported stripe instance
+      const { stripe } = await import('./stripe');
+      
       const paymentIntent = await stripe.paymentIntents.create({
-        amount,
+        amount: Math.round(pkg.price * 100), // Convert to cents
         currency,
+        automatic_payment_methods: {
+          enabled: true,
+        },
         metadata: {
           userId: req.session.userId.toString(),
           packageId,
-          credits: credits.toString(),
+          credits: expectedCredits.toString(),
           username: user.username,
+          priceId: pkg.stripePriceId,
         },
-        description: `StarForge Hub - ${pkg.name} (${credits} credits)`,
+        description: `StarForge Hub - ${pkg.name} (${expectedCredits} credits)`,
+      });
+
+      // Store payment record in database
+      await storage.createPayment({
+        userId: req.session.userId,
+        stripePaymentIntentId: paymentIntent.id,
+        packageId,
+        packageName: pkg.name,
+        amount: pkg.price,
+        credits: expectedCredits,
+        currency
       });
 
       res.json({
         clientSecret: paymentIntent.client_secret,
         packageId,
-        credits,
-        amount,
+        credits: expectedCredits,
+        amount: Math.round(pkg.price * 100),
+        priceId: pkg.stripePriceId,
       });
     } catch (error: any) {
       console.error('Create payment intent error:', error);

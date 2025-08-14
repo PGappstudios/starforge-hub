@@ -50,8 +50,6 @@ const CheckoutForm = ({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps
         credentials: 'include',
         body: JSON.stringify({
           packageId: pkg.id,
-          amount: Math.round(pkg.price * 100), // Convert to cents
-          credits: pkg.credits + pkg.bonus,
           currency: 'usd',
         }),
       });

@@ -20,6 +20,7 @@ export const users = pgTable('users', {
   gamesPlayed: integer('games_played').notNull().default(0),
   achievements: integer('achievements').notNull().default(0),
   credits: integer('credits').notNull().default(10),
+  stripeCustomerId: varchar('stripe_customer_id', { length: 255 }), // Stripe customer ID
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
