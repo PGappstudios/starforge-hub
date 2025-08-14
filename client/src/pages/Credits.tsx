@@ -65,7 +65,7 @@ const Credits = () => {
             name: "Gamer Pack",
             credits: 250,
             price: 9.99,
-            bonus: 50,
+            bonus: 0,
             popular: true
           }
         ]);
