@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,16 +19,48 @@ import {
   X
 } from "lucide-react";
 import { useCredits } from "@/contexts/CreditsContext";
+import { useAuth } from "@/contexts/AuthContext";
 import StripeCheckout from "@/components/StripeCheckout";
 import PaymentHistory from "@/components/PaymentHistory";
+import { toast } from "@/components/ui/sonner";
 
 const Credits = () => {
   const { credits, transactions } = useCredits();
+  const { checkAuthStatus } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [availablePackages, setAvailablePackages] = useState<any[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(true);
   const [packageError, setPackageError] = useState<string | null>(null);
+
+  // Handle Stripe redirect responses
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    const sessionId = searchParams.get('session_id');
+
+    if (success === 'true') {
+      toast.success('Payment successful!', {
+        description: 'Your credits have been added to your account.',
+        duration: 5000,
+      });
+      
+      // Refresh user data to get updated credits
+      checkAuthStatus();
+      
+      // Clear URL parameters
+      setSearchParams({});
+    } else if (canceled === 'true') {
+      toast.info('Payment canceled', {
+        description: 'Your payment was canceled. You can try again anytime.',
+        duration: 3000,
+      });
+      
+      // Clear URL parameters
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, checkAuthStatus]);
 
   // Load available packages from backend with error handling
   useEffect(() => {

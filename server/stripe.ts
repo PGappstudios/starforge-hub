@@ -32,15 +32,6 @@ export const CREDIT_PACKAGES = {
     stripePriceId: process.env.STRIPE_GAMER_PRICE_ID || 'price_gamer', // Set actual price ID in env
     popular: true,
   },
-  pro: {
-    id: 'pro',
-    name: 'Pro Pack',
-    credits: 500,
-    bonus: 150,
-    price: 19.99,
-    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro', // Set actual price ID in env
-    popular: false,
-  },
 } as const;
 
 export type PackageId = keyof typeof CREDIT_PACKAGES;

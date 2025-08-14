@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Elements } from '@stripe/react-stripe-js';
-import { getStripe } from '@/lib/stripe';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CreditCard, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCredits } from '@/contexts/CreditsContext';
 
 interface CreditPackage {
   id: string;
@@ -23,57 +20,25 @@ interface StripeCheckoutProps {
   onCancel?: () => void;
 }
 
-const CheckoutForm = ({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps) => {
+export default function StripeCheckout({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps) {
   const [loading, setLoading] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'succeeded' | 'failed'>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
   const { user, isLoading: authLoading } = useAuth();
-  const { addCredits } = useCredits();
 
-  // Check authentication status on mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/user', { credentials: 'include' });
-        setAuthChecked(true);
-        if (response.ok) {
-          const userData = await response.json();
-          console.log('Auth check success:', userData);
-        } else {
-          console.log('Auth check failed:', response.status);
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setAuthChecked(true);
-      }
-    };
-    
-    checkAuth();
-  }, []);
-
-  const handlePayment = async () => {
-    // Double-check authentication
-    try {
-      const authResponse = await fetch('/api/user', { credentials: 'include' });
-      if (!authResponse.ok) {
-        setError('Please log in to purchase credits');
-        return;
-      }
-    } catch (error) {
+  const handleCheckout = async () => {
+    if (!user) {
       setError('Please log in to purchase credits');
       return;
     }
 
     setLoading(true);
-    setPaymentStatus('processing');
     setError(null);
 
     try {
-      console.log('Creating payment intent for package:', pkg.id);
+      console.log('Creating checkout session for package:', pkg.id);
       
-      // Create payment intent
-      const response = await fetch('/api/stripe/create-payment-intent', {
+      // Create Stripe Checkout Session
+      const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,188 +46,96 @@ const CheckoutForm = ({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps
         credentials: 'include',
         body: JSON.stringify({
           packageId: pkg.id,
-          currency: 'usd',
         }),
       });
 
-      const data = await response.json();
-      console.log('Payment intent response:', data);
-
       if (!response.ok) {
-        throw new Error(data.message || `Payment failed with status ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create checkout session');
       }
 
-      // Check if this is test mode (development environment)
-      if (data.testMode || process.env.NODE_ENV === 'development') {
-        console.log('Test mode payment - simulating success');
-        setPaymentStatus('succeeded');
-        
-        // Add credits immediately for test mode
-        const totalCredits = pkg.credits + pkg.bonus;
-        await addCredits(totalCredits, `Purchased ${pkg.name} via Stripe (Test)`);
-        
-        onSuccess?.();
-        return;
-      }
-
-      // For production Stripe payments
-      if (data.clientSecret) {
-        // In a real implementation, you would use Stripe Elements here
-        // For now, we'll simulate success since we don't have full Stripe Elements setup
-        console.log('Simulating successful payment confirmation');
-        setPaymentStatus('succeeded');
-        
-        // Add credits
-        const totalCredits = pkg.credits + pkg.bonus;
-        await addCredits(totalCredits, `Purchased ${pkg.name} via Stripe`);
-        
-        onSuccess?.();
+      const { url } = await response.json();
+      
+      if (url) {
+        // Redirect to Stripe Checkout
+        window.location.href = url;
       } else {
-        throw new Error('Invalid payment response - missing client secret');
+        throw new Error('No checkout URL received');
       }
-
-    } catch (err: any) {
-      console.error('Payment error:', err);
-      const errorMessage = err.message || 'Payment failed. Please try again.';
-      setError(errorMessage);
-      setPaymentStatus('failed');
-    } finally {
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setError(error instanceof Error ? error.message : 'Payment failed');
       setLoading(false);
     }
   };
 
-  if (paymentStatus === 'succeeded') {
+  if (authLoading) {
     return (
-      <Card className="bg-green-500/10 border-green-500/20">
+      <Card className="w-full">
         <CardContent className="p-6 text-center">
-          <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-          <h3 className="text-xl font-futuristic text-white mb-2">Payment Successful!</h3>
-          <p className="text-green-400 mb-4">
-            {pkg.credits + pkg.bonus} credits have been added to your account.
-          </p>
-          <Button onClick={onSuccess} className="bg-green-600 hover:bg-green-700">
-            Continue
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (paymentStatus === 'failed') {
-    return (
-      <Card className="bg-red-500/10 border-red-500/20">
-        <CardContent className="p-6 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h3 className="text-xl font-futuristic text-white mb-2">Payment Failed</h3>
-          <p className="text-red-400 mb-4">{error}</p>
-          <div className="space-x-3">
-            <Button
-              onClick={() => {
-                setPaymentStatus('idle');
-                setError(null);
-              }}
-              variant="outline"
-            >
-              Try Again
-            </Button>
-            <Button onClick={onCancel} variant="ghost">
-              Cancel
-            </Button>
-          </div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p>Loading...</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-black/20 backdrop-blur-md border border-white/20">
+    <Card className="w-full">
       <CardContent className="p-6">
-        {/* Package Details */}
-        <div className="text-center mb-6">
-          <h3 className="text-2xl font-futuristic text-white mb-2">{pkg.name}</h3>
-          {pkg.popular && (
-            <Badge className="bg-primary text-primary-foreground mb-4">
-              MOST POPULAR
-            </Badge>
-          )}
-          
-          <div className="text-4xl font-futuristic font-bold text-primary mb-2">
-            {pkg.credits}
-            {pkg.bonus > 0 && (
-              <span className="text-lg text-green-400 ml-2">+{pkg.bonus} Bonus</span>
-            )}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              {pkg.name}
+              {pkg.popular && <Badge variant="secondary">Popular</Badge>}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {pkg.credits} credits{pkg.bonus > 0 && ` + ${pkg.bonus} bonus`}
+            </p>
           </div>
-          <div className="text-sm text-white/70 mb-4">
-            Total: {pkg.credits + pkg.bonus} Credits
-          </div>
-          
-          <div className="text-3xl font-futuristic font-bold text-white">
-            ${pkg.price.toFixed(2)}
+          <div className="text-right">
+            <p className="text-2xl font-bold">${pkg.price}</p>
+            <p className="text-sm text-muted-foreground">USD</p>
           </div>
         </div>
 
-        {/* Error Display */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
-            <div className="flex items-center gap-2 text-red-400">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm">{error}</span>
-            </div>
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm">{error}</span>
           </div>
         )}
 
-        {/* Payment Button */}
-        <div className="space-y-4">
-          <Button
-            onClick={handlePayment}
-            disabled={loading || paymentStatus === 'processing'}
-            className="w-full bg-primary hover:bg-primary/80 font-futuristic"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Processing Payment...
-              </>
-            ) : (
-              <>
-                <CreditCard className="w-4 h-4 mr-2" />
-                Purchase for ${pkg.price.toFixed(2)}
-              </>
-            )}
-          </Button>
-          
-          <Button
-            onClick={onCancel}
-            variant="ghost"
-            className="w-full"
-            disabled={loading}
-          >
-            Cancel
-          </Button>
-        </div>
-
-        {/* Test Mode Notice */}
-        <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-          <div className="flex items-center gap-2 text-yellow-400">
-            <AlertCircle className="w-4 h-4" />
-            <span className="text-sm">
-              Test Mode: No real payments will be processed
-            </span>
+        {!user ? (
+          <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-md flex items-center gap-2 text-amber-600 dark:text-amber-400">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm">Please log in to purchase credits</span>
           </div>
-        </div>
+        ) : null}
+
+        <Button 
+          onClick={handleCheckout}
+          disabled={loading || !user}
+          className="w-full"
+          size="lg"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Creating checkout...
+            </>
+          ) : (
+            <>
+              <CreditCard className="h-4 w-4 mr-2" />
+              Buy Now
+            </>
+          )}
+        </Button>
+
+        <p className="text-xs text-muted-foreground mt-3 text-center">
+          Secure payment powered by Stripe
+        </p>
       </CardContent>
     </Card>
   );
-};
-
-export const StripeCheckout = ({ package: pkg, onSuccess, onCancel }: StripeCheckoutProps) => {
-  const [stripePromise] = useState(() => getStripe());
-
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm package={pkg} onSuccess={onSuccess} onCancel={onCancel} />
-    </Elements>
-  );
-};
-
-export default StripeCheckout;
+}

@@ -540,6 +540,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(Object.values(CREDIT_PACKAGES));
   });
 
+  // Create Stripe Checkout Session (following official documentation)
+  app.post("/api/stripe/create-checkout-session", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const { packageId } = req.body;
+      
+      // Validate package
+      const pkg = getPackageById(packageId);
+      if (!pkg) {
+        return res.status(400).json({ message: "Invalid package ID" });
+      }
+
+      // Get user for customer creation
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Create Stripe checkout session
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: pkg.stripePriceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?canceled=true`,
+        customer_email: user.email,
+        metadata: {
+          userId: req.session.userId.toString(),
+          packageId: packageId,
+          credits: (pkg.credits + pkg.bonus).toString(),
+        },
+      });
+
+      console.log(`Created Stripe checkout session: ${session.id} for user ${req.session.userId}, package ${packageId}`);
+      
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Create checkout session error:", error);
+      res.status(500).json({ message: "Failed to create checkout session" });
+    }
+  });
+
   // Create payment intent with validation
   app.post("/api/stripe/create-payment-intent", async (req, res) => {
     if (!req.session.userId) {
@@ -691,9 +740,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Stripe webhook event:', event.type);
       
       switch (event.type) {
-        case 'payment_intent.succeeded': {
-          const paymentIntent = event.data.object as any;
-          const { userId, packageId, credits } = paymentIntent.metadata;
+        case 'checkout.session.completed': {
+          const session = event.data.object as any;
+          const { userId, packageId, credits } = session.metadata;
           
           if (userId && packageId && credits) {
             try {
@@ -708,9 +757,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
         }
         
-        case 'payment_intent.payment_failed': {
-          const paymentIntent = event.data.object as any;
-          const { userId, packageId } = paymentIntent.metadata;
+        case 'checkout.session.async_payment_succeeded': {
+          const session = event.data.object as any;
+          const { userId, packageId, credits } = session.metadata;
+          
+          if (userId && packageId && credits) {
+            try {
+              // Add credits to user account for async payments (like bank transfers)
+              await storage.addUserCredits(parseInt(userId), parseInt(credits));
+              
+              console.log(`Credits added (async): User ${userId} received ${credits} credits for package ${packageId}`);
+            } catch (error) {
+              console.error('Error adding credits from async webhook:', error);
+            }
+          }
+          break;
+        }
+        
+        case 'checkout.session.async_payment_failed': {
+          const session = event.data.object as any;
+          const { userId, packageId } = session.metadata;
           
           console.log(`Payment failed for user ${userId}, package ${packageId}`);
           // Could implement retry logic or notification here

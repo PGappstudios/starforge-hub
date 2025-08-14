@@ -36,8 +36,8 @@ const App = () => (
     <AuthProvider>
       <SettingsProvider>
         <CreditsProvider>
-          <CreditNotificationProvider>
-            <TooltipProvider>
+          <TooltipProvider>
+            <CreditNotificationProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -59,8 +59,8 @@ const App = () => (
                 </Routes>
                 <MusicPlayer />
               </BrowserRouter>
-            </TooltipProvider>
-          </CreditNotificationProvider>
+            </CreditNotificationProvider>
+          </TooltipProvider>
         </CreditsProvider>
       </SettingsProvider>
     </AuthProvider>
