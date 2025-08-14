@@ -343,8 +343,30 @@ export class DatabaseStorage {
   ): Promise<any[]> {
     const gameTable = this.getGameTable(gameId);
     const results = await db
-      .select()
+      .select({
+        // Game leaderboard fields
+        id: gameTable.id,
+        userId: gameTable.userId,
+        username: gameTable.username,
+        score: gameTable.score,
+        points: gameTable.points,
+        playedAt: gameTable.playedAt,
+        leaderboardType: gameTable.leaderboardType,
+        periodStart: gameTable.periodStart,
+        periodEnd: gameTable.periodEnd,
+        createdAt: gameTable.createdAt,
+        updatedAt: gameTable.updatedAt,
+        // User fields nested under 'user'
+        user: {
+          id: users.id,
+          username: users.username,
+          faction: users.faction,
+          totalPoints: users.totalPoints,
+          gamesPlayed: users.gamesPlayed
+        }
+      })
       .from(gameTable)
+      .innerJoin(users, eq(gameTable.userId, users.id))
       .where(eq(gameTable.leaderboardType, type))
       .orderBy(desc(gameTable.score))
       .limit(limit);
