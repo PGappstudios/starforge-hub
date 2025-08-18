@@ -31,9 +31,9 @@ const DiceOfIris = () => {
   const [diceGlow, setDiceGlow] = useState(0);
   const [showResultAnimation, setShowResultAnimation] = useState(false);
 
-  // Cooldown system - 50 hours = 50 * 60 * 60 * 1000 milliseconds
-  const COOLDOWN_HOURS = 50;
-  const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
+  // Cooldown system - 4260 minutes = 4260 * 60 * 1000 milliseconds
+  const COOLDOWN_MINUTES = 4260;
+  const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
   const [lastRollTime, setLastRollTime] = useState<number | null>(() => {
     const saved = localStorage.getItem('diceOfIris_lastRoll');
     return saved ? parseInt(saved, 10) : null;
@@ -114,13 +114,10 @@ const DiceOfIris = () => {
   }, []);
 
 
-  // Helper function to format countdown time
+  // Helper function to format countdown time in minutes
   const formatTimeRemaining = (ms: number) => {
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const totalMinutes = Math.floor(ms / (1000 * 60));
+    return `${totalMinutes} minutes`;
   };
 
   const rollDice = useCallback(() => {
@@ -329,7 +326,7 @@ const DiceOfIris = () => {
                         {formatTimeRemaining(timeRemaining)}
                       </div>
                       <div className="text-xs text-red-200">
-                        Next roll available in: {Math.floor(timeRemaining / (1000 * 60 * 60))} hours, {Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60))} minutes
+                        Next roll available in: {Math.floor(timeRemaining / (1000 * 60))} minutes
                       </div>
                     </div>
                   )}
@@ -412,7 +409,7 @@ const DiceOfIris = () => {
                 <div className="p-3 bg-orange-900/20 border border-orange-500/30 rounded-lg">
                   <div className="text-orange-400 font-bold text-xs mb-1">⏱️ COOLDOWN SYSTEM</div>
                   <div className="text-orange-200 text-xs">
-                    Each player can roll the dice once every <span className="font-bold">{COOLDOWN_HOURS} hours</span>
+                    Each player can roll the dice once every <span className="font-bold">{COOLDOWN_MINUTES} minutes</span>
                   </div>
                 </div>
 
