@@ -12,7 +12,6 @@ interface PuzzleGameProps {
 }
 
 const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
-  console.log('PuzzleGame component rendering...');
 
   const [gameStatus, setGameStatus] = useState<'instructions' | 'menu' | 'preview' | 'playing' | 'completed'>('instructions');
   const [previewTimeLeft, setPreviewTimeLeft] = useState(3);
@@ -77,7 +76,7 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   const [imageError, setImageError] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
   const [pieces, setPieces] = useState<number[]>(() => {
-    // Create shuffled array of numbers 0-15
+    // Create shuffled array of numbers 0-15 (all pieces have images)
     const shuffled = Array.from({ length: 16 }, (_, i) => i);
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -260,11 +259,6 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   const handlePieceClick = (clickedIndex: number) => {
     if (gameStatus !== 'playing') return;
     
-    const clickedPiece = pieces[clickedIndex];
-    
-    // Skip empty pieces
-    if (clickedPiece === 15) return;
-    
     if (selectedPiece === null) {
       // First piece selection
       setSelectedPiece(clickedIndex);
@@ -307,11 +301,11 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   // Remove unused adjacent check function since we're allowing any two pieces to swap
 
   const isPuzzleSolved = (currentPieces: number[]): boolean => {
-    // Check if pieces are in order 0,1,2,...,14,15
-    for (let i = 0; i < 15; i++) {
+    // Check if pieces are in order 0,1,2,...,15
+    for (let i = 0; i < 16; i++) {
       if (currentPieces[i] !== i) return false;
     }
-    return currentPieces[15] === 15;
+    return true;
   };
 
   const calculateScore = (totalMoves: number, totalTime: number): number => {
@@ -451,15 +445,11 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
                     key={index}
                     onClick={() => handlePieceClick(index)}
                     className={`
-                      aspect-square border-0 transition-all duration-200 cursor-pointer
-                      ${piece === 15 
-                        ? 'bg-gray-800' 
-                        : 'hover:brightness-110'
-                      }
+                      aspect-square border-0 transition-all duration-200 cursor-pointer hover:brightness-110
                       ${selectedPiece === index ? 'ring-4 ring-yellow-400 ring-inset' : ''}
                     `}
                   >
-                    {piece !== 15 && imagePieces[piece] && (
+                    {imagePieces[piece] && (
                       <img
                         src={imagePieces[piece]}
                         alt={`Piece ${piece + 1}`}
