@@ -440,25 +440,37 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
           <Card className="bg-gray-900 border-gray-700">
             <CardContent className="p-6">
               <div className="grid grid-cols-4 gap-0 max-w-md mx-auto border-2 border-purple-400">
-                {pieces.map((piece, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handlePieceClick(index)}
-                    className={`
-                      aspect-square border-0 transition-all duration-200 cursor-pointer hover:brightness-110
-                      ${selectedPiece === index ? 'ring-4 ring-yellow-400 ring-inset' : ''}
-                    `}
-                  >
-                    {imagePieces[piece] && (
-                      <img
-                        src={imagePieces[piece]}
-                        alt={`Piece ${piece + 1}`}
-                        className="w-full h-full object-cover"
-                        draggable={false}
-                      />
-                    )}
-                  </div>
-                ))}
+                {pieces.map((piece, index) => {
+                  const isCorrectPosition = piece === index;
+                  const isSelected = selectedPiece === index;
+                  
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => handlePieceClick(index)}
+                      className={`
+                        aspect-square transition-all duration-200 cursor-pointer hover:brightness-110 relative
+                        ${isCorrectPosition 
+                          ? 'border-2 border-green-400' 
+                          : 'border-0'
+                        }
+                        ${isSelected ? 'ring-4 ring-yellow-400 ring-inset' : ''}
+                      `}
+                    >
+                      {imagePieces[piece] && (
+                        <img
+                          src={imagePieces[piece]}
+                          alt={`Piece ${piece + 1}`}
+                          className="w-full h-full object-cover"
+                          draggable={false}
+                        />
+                      )}
+                      {isCorrectPosition && (
+                        <div className="absolute inset-0 border-2 border-green-400 pointer-events-none"></div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
