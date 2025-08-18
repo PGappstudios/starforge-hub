@@ -9,13 +9,12 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageMusic } from "@/hooks/usePageMusic";
 import { useAudioManager } from "@/hooks/useAudioManager";
-import { useToast } from "@/hooks/use-toast";
+
 
 const Index = () => {
   const navigate = useNavigate();
   const { showIntroVideo } = useSettings();
-  const { isAuthenticated, checkAuth } = useAuth();
-  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
   
@@ -24,28 +23,7 @@ const Index = () => {
   // Access audio manager for manual music start
   const { currentTrack, isPlaying, playAllTracks } = useAudioManager();
 
-  // Handle Discord OAuth callback
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const authStatus = params.get('auth');
-    
-    if (authStatus === 'success') {
-      toast({
-        title: "Welcome!",
-        description: "Successfully signed in with Discord.",
-      });
-      checkAuth(); // Refresh authentication state
-      navigate('/dashboard', { replace: true });
-    } else if (authStatus === 'error') {
-      toast({
-        title: "Authentication Error",
-        description: "Failed to sign in with Discord. Please try again.",
-        variant: "destructive",
-      });
-      // Clear the URL parameters
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [navigate, toast, checkAuth]);
+
   
   const handleStartMusic = async () => {
     if (!currentTrack && !isPlaying) {
