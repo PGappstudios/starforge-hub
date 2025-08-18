@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MusicPlayer from "@/components/MusicPlayer";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { CreditsProvider } from "@/contexts/CreditsContext";
+import { AudioManagerProvider } from "@/contexts/AudioManagerContext";
 import { useCreditNotifications } from "@/hooks/useCreditNotifications";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -35,9 +36,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <SettingsProvider>
-        <CreditsProvider>
-          <TooltipProvider>
-            <CreditNotificationProvider>
+        <AudioManagerProvider>
+          <CreditsProvider>
+            <TooltipProvider>
+              <CreditNotificationProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -59,9 +61,10 @@ const App = () => (
                 </Routes>
                 <MusicPlayer />
               </BrowserRouter>
-            </CreditNotificationProvider>
-          </TooltipProvider>
-        </CreditsProvider>
+              </CreditNotificationProvider>
+            </TooltipProvider>
+          </CreditsProvider>
+        </AudioManagerProvider>
       </SettingsProvider>
     </AuthProvider>
   </QueryClientProvider>

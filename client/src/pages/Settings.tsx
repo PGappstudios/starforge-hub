@@ -144,7 +144,7 @@ const Settings = () => {
       masterVolume: 1,
       musicVolume: 0.5,
       sfxVolume: 0.5,
-      voiceVolume: 0.5,
+      muteAll: false,
     });
     toast({
       title: "Settings Reset",
@@ -375,21 +375,7 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  {/* Voice Volume */}
-                  <div className="space-y-4">
-                    <Label htmlFor="voice-volume" className="font-futuristic text-lg">Voice Volume</Label>
-                    <Slider
-                      id="voice-volume"
-                      value={[audioSettings.voiceVolume * 100]}
-                      onValueChange={(value) => updateAudioSettings({ voiceVolume: value[0] / 100 })}
-                      max={100}
-                      step={1}
-                      className="[&>span:first-child]:bg-purple-500"
-                    />
-                    <div className="flex justify-between text-white/70">
-                      <span>{Math.round(audioSettings.voiceVolume * 100)}%</span>
-                    </div>
-                  </div>
+
 
                   {/* Music controls removed - use Music Player component only */}
 
