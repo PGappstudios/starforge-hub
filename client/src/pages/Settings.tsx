@@ -72,32 +72,70 @@ const Settings = () => {
     );
   }
 
-  if (!user) {
+  if (!user || !isAuthenticated) {
     return (
       <div className="min-h-screen cosmic-bg flex items-center justify-center">
-        <div className="text-white text-xl font-futuristic">Please sign in to access settings</div>
+        <div className="text-center">
+          <div className="text-white text-xl font-futuristic mb-4">Please sign in to access settings</div>
+          <button 
+            onClick={() => window.location.href = '/'} 
+            className="nav-button"
+          >
+            Return to Home
+          </button>
+        </div>
       </div>
     );
   }
 
   const handleSaveProfile = async () => {
+    if (!user || !isAuthenticated) {
+      toast({
+        title: "Authentication Error",
+        description: "Please sign in to update your profile.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
+      console.log('Attempting to save profile:', { 
+        faction: selectedFaction,
+        email: email.trim() || undefined,
+        solanaWallet: solanaWallet.trim() || undefined
+      });
+
       await updateProfile({ 
         faction: selectedFaction,
         email: email.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
+      
       toast({
         title: "Profile Updated!",
         description: "Your profile has been successfully updated.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      
+      let errorMessage = "Failed to update profile. Please try again.";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // If it's an authentication error, redirect to home
+      if (error.message?.includes('authenticated') || error.message?.includes('401')) {
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      }
     } finally {
       setIsSaving(false);
     }

@@ -225,24 +225,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update user profile
   app.put("/api/user/profile", async (req, res) => {
+    console.log("Profile update attempt - Session ID:", req.sessionID, "UserID:", req.session.userId);
+    console.log("Profile update data:", req.body);
+
     if (!req.session.userId) {
-      return res.status(401).json({ message: "Not authenticated" });
+      console.log("Profile update failed: No session userId");
+      return res.status(401).json({ message: "Not authenticated - please sign in again" });
     }
 
     try {
       const profileData = updateUserProfileSchema.parse(req.body);
+      console.log("Validated profile data:", profileData);
+      
       const user = await storage.updateUserProfile(req.session.userId, profileData);
       
       if (!user) {
+        console.log("Profile update failed: User not found for ID:", req.session.userId);
         return res.status(404).json({ message: "User not found" });
       }
 
+      console.log("Profile updated successfully for user:", req.session.userId);
+      
       // Return user without password
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update profile error:", error);
-      res.status(400).json({ message: "Invalid input" });
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Invalid input data", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Internal server error while updating profile" 
+      });
     }
   });
 

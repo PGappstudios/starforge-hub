@@ -63,6 +63,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const updateProfile = async (profile: { faction?: "oni" | "mud" | "ustur"; email?: string; solanaWallet?: string }) => {
     try {
+      console.log('AuthContext: Updating profile with data:', profile);
+      
       const response = await fetch("/api/user/profile", {
         method: "PUT",
         headers: {
@@ -72,15 +74,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         credentials: "include",
       });
 
+      console.log('AuthContext: Profile update response status:', response.status);
+
       if (response.ok) {
         const userData = await response.json();
+        console.log('AuthContext: Profile updated successfully:', userData);
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
       } else {
-        throw new Error("Failed to update profile");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Server responded with status ${response.status}`;
+        console.error('AuthContext: Profile update failed:', errorMessage);
+        
+        // If it's an authentication error, clear the session
+        if (response.status === 401) {
+          setUser(null);
+          setIsAuthenticated(false);
+          localStorage.removeItem("user");
+        }
+        
+        throw new Error(errorMessage);
       }
-    } catch (error) {
-      console.error("Update profile error:", error);
+    } catch (error: any) {
+      console.error("AuthContext: Update profile error:", error);
       throw error;
     }
   };
