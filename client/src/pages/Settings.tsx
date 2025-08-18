@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAudioManager } from "@/hooks/useAudioManager";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -20,15 +19,12 @@ import {
   Settings as SettingsIcon, 
   User, 
   Gamepad2, 
-  Volume2, 
   Monitor, 
   Shield, 
   Bell,
   Palette,
   Save,
-  RefreshCw,
-  Video,
-  Music
+  RefreshCw
 } from "lucide-react";
 
 const Settings = () => {
@@ -36,17 +32,10 @@ const Settings = () => {
   const { user, isLoading, updateProfile } = useAuth();
   const { toast } = useToast();
 
-  // Audio Manager
-  const { audioSettings, updateAudioSettings } = useAudioManager();
-
   // Settings Context
   const { 
     showIntroVideo, 
-    setShowIntroVideo,
-    pauseMusicForVideo,
-    setPauseMusicForVideo,
-    videoMusicBehavior,
-    setVideoMusicBehavior
+    setShowIntroVideo
   } = useSettings();
 
   // Profile Settings (synced with user data)
@@ -146,12 +135,6 @@ const Settings = () => {
     setEmail(user.email || "");
     setSolanaWallet(user.solanaWallet || "");
     setShowIntroVideo(true);
-    updateAudioSettings({
-      masterVolume: 75,
-      musicVolume: 60,
-      sfxVolume: 80,
-      muteAll: false,
-    });
     toast({
       title: "Settings Reset",
       description: "Settings reset to defaults!",
@@ -175,14 +158,10 @@ const Settings = () => {
 
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsList className="grid w-full grid-cols-1 mb-8">
               <TabsTrigger value="profile" className="font-futuristic flex items-center gap-2">
                 <User className="w-4 h-4" />
                 Profile
-              </TabsTrigger>
-              <TabsTrigger value="audio" className="font-futuristic flex items-center gap-2">
-                <Volume2 className="w-4 h-4" />
-                Audio
               </TabsTrigger>
             </TabsList>
 
@@ -325,141 +304,6 @@ const Settings = () => {
                   </CardContent>
                 </Card>
               </div>
-            </TabsContent>
-
-
-            {/* Audio Settings */}
-            <TabsContent value="audio">
-              <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
-                <CardHeader>
-                  <CardTitle className="font-futuristic text-2xl flex items-center gap-3">
-                    <Volume2 className="w-6 h-6 text-primary" />
-                    Audio Control
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <Label htmlFor="mute-all" className="font-futuristic">Mute All Audio</Label>
-                    <Switch
-                      id="mute-all"
-                      checked={audioSettings.muteAll}
-                      onCheckedChange={(checked) => {
-                        console.log('🎵 Settings: Mute all changed to:', checked);
-                        updateAudioSettings({ muteAll: checked });
-                      }}
-                    />
-                  </div>
-
-                  <Separator />
-
-                  <div className="grid md:grid-cols-3 gap-8">
-                    <div className="space-y-4">
-                      <Label className="font-futuristic">Master Volume</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={[audioSettings.masterVolume]}
-                          onValueChange={(value) => {
-                            console.log('🎵 Settings: Master volume changed to:', value[0]);
-                            updateAudioSettings({ masterVolume: value[0] });
-                          }}
-                          max={100}
-                          step={5}
-                          disabled={audioSettings.muteAll}
-                          className="w-full"
-                        />
-                        <div className="text-center text-sm text-white/70 mt-2">
-                          {audioSettings.masterVolume}%
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <Label className="font-futuristic">Music Volume</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={[audioSettings.musicVolume]}
-                          onValueChange={(value) => {
-                            console.log('🎵 Settings: Music volume changed to:', value[0]);
-                            updateAudioSettings({ musicVolume: value[0] });
-                          }}
-                          max={100}
-                          step={5}
-                          disabled={audioSettings.muteAll}
-                          className="w-full"
-                        />
-                        <div className="text-center text-sm text-white/70 mt-2">
-                          {audioSettings.musicVolume}%
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <Label className="font-futuristic">Sound Effects</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={[audioSettings.sfxVolume]}
-                          onValueChange={(value) => {
-                            console.log('🎵 Settings: SFX volume changed to:', value[0]);
-                            updateAudioSettings({ sfxVolume: value[0] });
-                          }}
-                          max={100}
-                          step={5}
-                          disabled={audioSettings.muteAll}
-                          className="w-full"
-                        />
-                        <div className="text-center text-sm text-white/70 mt-2">
-                          {audioSettings.sfxVolume}%
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Video & Music Integration */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Video className="w-5 h-5 text-primary" />
-                      <h3 className="font-futuristic text-lg">Video & Music Integration</h3>
-                    </div>
-
-                    {/* Show Intro Video Setting */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Monitor className="w-5 h-5 text-white/70" />
-                        <div>
-                          <Label htmlFor="show-intro-video" className="font-futuristic">Show Intro Video</Label>
-                          <p className="text-sm text-white/60">Display trailer video when entering the hub</p>
-                        </div>
-                      </div>
-                      <Switch
-                        id="show-intro-video"
-                        checked={showIntroVideo}
-                        onCheckedChange={setShowIntroVideo}
-                      />
-                    </div>
-
-                    {/* Pause Music for Video */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Music className="w-5 h-5 text-white/70" />
-                        <div>
-                          <Label htmlFor="pause-music-video" className="font-futuristic">Pause Music for Videos</Label>
-                          <p className="text-sm text-white/60">Automatically pause background music during videos</p>
-                        </div>
-                      </div>
-                      <Switch
-                        id="pause-music-video"
-                        checked={pauseMusicForVideo}
-                        onCheckedChange={setPauseMusicForVideo}
-                      />
-                    </div>
-
-                    {/* Video Music Behavior removed by request */}
-                  </div>
-
-                </CardContent>
-              </Card>
             </TabsContent>
 
 
