@@ -95,7 +95,7 @@ export const useAudioManager = () => {
   const [savedPosition, setSavedPosition] = useState(0);
   const [videoPaused, setVideoPaused] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
-  
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(loadStoredSettings());
   const [musicEnabled, setMusicEnabled] = useState(isMusicEnabled());
@@ -106,7 +106,7 @@ export const useAudioManager = () => {
       console.log('🎵 Audio element already exists, skipping initialization');
       return;
     }
-    
+
     console.log('🎵 Initializing audio manager...');
     audioRef.current = new Audio();
     const audio = audioRef.current;
@@ -175,38 +175,38 @@ export const useAudioManager = () => {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       setIsPlaying(false);
-      
+
       const audioPath = `/assets/Music/${track.filename}`;
       console.log(`🎵 Setting audio source to: ${audioPath}`);
       setIsLoading(true);
       audioRef.current.src = audioPath;
       setCurrentTrack(track);
       setCurrentTime(0);
-      
+
       // Add load event listeners for debugging
       audioRef.current.addEventListener('loadstart', () => {
         console.log('🎵 Audio loading started');
       }, { once: true });
-      
+
       audioRef.current.addEventListener('canplay', () => {
         console.log('🎵 ✅ Audio can start playing');
         setIsLoading(false);
       }, { once: true });
-      
+
       audioRef.current.addEventListener('canplaythrough', () => {
         console.log('🎵 ✅ Audio can play through without buffering');
       }, { once: true });
-      
+
       audioRef.current.addEventListener('error', (e) => {
         const errorDetails = audioRef.current?.error;
         const errorMessage = errorDetails ? 
           `Code: ${errorDetails.code}, Message: ${errorDetails.message || 'Unknown error'}` :
           'Unknown audio error';
-        
+
         console.error('🎵 ❌ Audio loading error for:', audioPath);
         console.error('🎵 ❌ Error details:', errorMessage);
         console.error('🎵 ❌ MediaError codes: 1=Aborted, 2=Network, 3=Decode, 4=NotSupported');
-        
+
         // Check if file exists by trying to fetch it
         fetch(audioPath, { method: 'HEAD' })
           .then(response => {
@@ -219,26 +219,26 @@ export const useAudioManager = () => {
           .catch(fetchError => {
             console.error('🎵 ❌ Failed to verify audio file existence:', fetchError);
           });
-        
+
         setIsLoading(false);
         setCurrentTrack(null); // Clear failed track
       }, { once: true });
     } else {
       console.error('🎵 ❌ Audio reference is null!');
     }
-  }, []);
+  }, [audioSettings]);
 
   const play = useCallback(async () => {
     if (!audioRef.current) {
       console.error('🎵 ❌ Cannot play - audio element not initialized');
       return;
     }
-    
+
     if (!currentTrack) {
       console.error('🎵 ❌ Cannot play - no track loaded');
       return;
     }
-    
+
     if (!musicEnabled) {
       console.log('🎵 ❌ Cannot play - music disabled by user');
       return;
@@ -246,45 +246,45 @@ export const useAudioManager = () => {
 
     try {
       console.log('🎵 Playing:', currentTrack.name);
-      
+
       // Check audio readiness
       if (audioRef.current.readyState < 2) {
         console.log('🎵 Audio not ready, waiting...');
         setIsLoading(true);
-        
+
         await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => {
             reject(new Error('Audio loading timeout'));
           }, 10000); // 10 second timeout
-          
+
           const onCanPlay = () => {
             clearTimeout(timeout);
             audioRef.current?.removeEventListener('canplay', onCanPlay);
             audioRef.current?.removeEventListener('error', onError);
             resolve(true);
           };
-          
+
           const onError = (e: Event) => {
             clearTimeout(timeout);
             audioRef.current?.removeEventListener('canplay', onCanPlay);
             audioRef.current?.removeEventListener('error', onError);
             reject(new Error('Audio loading failed'));
           };
-          
+
           audioRef.current?.addEventListener('canplay', onCanPlay);
           audioRef.current?.addEventListener('error', onError);
         });
       }
-      
+
       await audioRef.current.play();
       setIsPlaying(true);
       setIsLoading(false);
       console.log('🎵 ✅ Playback started successfully');
-      
+
     } catch (error: any) {
       setIsPlaying(false);
       setIsLoading(false);
-      
+
       // Handle specific error types
       if (error.name === 'NotAllowedError') {
         console.log('🎵 ⚠️ Autoplay blocked - user interaction required');
@@ -437,7 +437,7 @@ export const useAudioManager = () => {
   const createPlaylist = useCallback((tracks: Track[], startIndex = 0) => {
     console.log(`Creating playlist with ${tracks.length} tracks`);
     let finalTracks = [...tracks];
-    
+
     if (shuffle) {
       // Shuffle the tracks
       for (let i = finalTracks.length - 1; i > 0; i--) {
@@ -445,10 +445,10 @@ export const useAudioManager = () => {
         [finalTracks[i], finalTracks[j]] = [finalTracks[j], finalTracks[i]];
       }
     }
-    
+
     setPlaylist(finalTracks);
     setCurrentPlaylistIndex(startIndex);
-    
+
     if (finalTracks.length > 0) {
       playTrack(finalTracks[startIndex]);
     }
@@ -467,7 +467,7 @@ export const useAudioManager = () => {
     const newEnabled = !musicEnabled;
     console.log('🎵 Toggling music enabled:', newEnabled);
     setMusicEnabled(newEnabled);
-    
+
     if (!newEnabled && isPlaying) {
       pause();
     }
@@ -525,7 +525,7 @@ export const useAudioManager = () => {
     shuffle,
     repeat,
     savedPosition,
-    
+
     // Controls
     play,
     pause,
@@ -538,23 +538,23 @@ export const useAudioManager = () => {
     previousTrack,
     createPlaylist,
     playAllTracks,
-    
+
     // Settings
     setShuffle,
     setRepeat,
-    
+
     // Audio settings
     audioSettings,
     updateAudioSettings,
     playByCategory,
-    
+
     // Data
     allTracks: musicTracks,
-    
+
     // Music enabled state
     musicEnabled,
     toggleMusicEnabled,
-    
+
     // Video integration
     videoPaused,
     videoPlaying,

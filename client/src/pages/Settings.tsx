@@ -305,7 +305,10 @@ const Settings = () => {
                     <Switch
                       id="mute-all"
                       checked={audioSettings.muteAll}
-                      onCheckedChange={(checked) => updateAudioSettings({ muteAll: checked })}
+                      onCheckedChange={(checked) => {
+                        console.log('🎵 Settings: Mute all changed to:', checked);
+                        updateAudioSettings({ muteAll: checked });
+                      }}
                     />
                   </div>
 
@@ -317,7 +320,10 @@ const Settings = () => {
                       <div className="px-3">
                         <Slider
                           value={[audioSettings.masterVolume]}
-                          onValueChange={(value) => updateAudioSettings({ masterVolume: value[0] })}
+                          onValueChange={(value) => {
+                            console.log('🎵 Settings: Master volume changed to:', value[0]);
+                            updateAudioSettings({ masterVolume: value[0] });
+                          }}
                           max={100}
                           step={5}
                           disabled={audioSettings.muteAll}
@@ -334,7 +340,10 @@ const Settings = () => {
                       <div className="px-3">
                         <Slider
                           value={[audioSettings.musicVolume]}
-                          onValueChange={(value) => updateAudioSettings({ musicVolume: value[0] })}
+                          onValueChange={(value) => {
+                            console.log('🎵 Settings: Music volume changed to:', value[0]);
+                            updateAudioSettings({ musicVolume: value[0] });
+                          }}
                           max={100}
                           step={5}
                           disabled={audioSettings.muteAll}
@@ -351,7 +360,10 @@ const Settings = () => {
                       <div className="px-3">
                         <Slider
                           value={[audioSettings.sfxVolume]}
-                          onValueChange={(value) => updateAudioSettings({ sfxVolume: value[0] })}
+                          onValueChange={(value) => {
+                            console.log('🎵 Settings: SFX volume changed to:', value[0]);
+                            updateAudioSettings({ sfxVolume: value[0] });
+                          }}
                           max={100}
                           step={5}
                           disabled={audioSettings.muteAll}
