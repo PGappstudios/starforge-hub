@@ -96,12 +96,18 @@ All data is persistently stored in a PostgreSQL database using Neon serverless. 
 
 ## Recent Changes
 
-### 2025-08-14: Deployment Fix - Build Directory Structure
-- **Build Process Fix**: Created custom build script to resolve deployment issues
-- **Directory Structure**: Fixed mismatch between vite build output (client/dist) and server expectations (dist/public)
-- **Custom Build Script**: Added build.js script that properly copies client files to expected directory structure
-- **Deployment Ready**: Application now builds correctly with static files in the expected dist/public directory
-- **Server Compatibility**: Maintains compatibility with existing server configuration without breaking Vite setup
+### 2025-08-18: Deployment Fix - Build Directory Structure Resolution
+- **Deployment Issue Resolved**: Fixed build process that was causing deployment failures
+- **Root Cause**: Server expects static files in `dist/public/` but default build process puts them in `client/dist/`
+- **Solution Implemented**: Custom build.js script properly creates the required directory structure
+- **Build Process**: `node build.js` command creates proper `dist/public/` structure with static files
+- **Server Compatibility**: Fixed `serveStatic` function in server/vite.ts to correctly serve from `dist/public/`
+- **Package.json Constraint**: Cannot modify package.json build script due to system restrictions
+- **Deployment Instructions**: For proper deployment, use `node build.js` instead of `npm run build`
+- **Directory Structure Created**: 
+  - `dist/index.js` (server file)
+  - `dist/public/` (static files including index.html, assets, etc.)
+- **Deployment Ready**: Application now builds correctly for production deployment with proper file structure
 
 ### 2025-08-14: Real Stripe Payment Integration with Price IDs
 - **Complete Stripe Overhaul**: Implemented real Stripe Payment Intents API using Price IDs
@@ -171,6 +177,32 @@ All data is persistently stored in a PostgreSQL database using Neon serverless. 
 - Faction statistics dashboard
 - Real-time loading states and error handling
 
+## Deployment Instructions
+
+### For Production Deployment
+**Important**: Use the custom build script for proper deployment:
+
+```bash
+# Correct build command for deployment
+node build.js
+
+# This creates the proper directory structure:
+# dist/
+# ├── public/           # Static files (HTML, CSS, JS, assets)
+# │   ├── index.html
+# │   ├── assets/
+# │   └── ...other static files
+# └── index.js         # Built server file
+```
+
+**Do NOT use**: `npm run build` - This creates an incorrect directory structure that causes deployment failures.
+
+### Deployment Process
+1. Run `node build.js` to build for production
+2. Deploy the `dist/` directory 
+3. The server will correctly serve static files from `dist/public/`
+4. Server runs from `dist/index.js`
+
 ## Project Structure
 ```
 client/src/
@@ -178,6 +210,9 @@ client/src/
   utils/gameLeaderboard.ts  - Game integration utilities
   
 server/
-  storage.ts               - In-memory storage operations
+  storage.ts               - Database storage operations (PostgreSQL)
   routes.ts               - API endpoints and validation schemas
+  vite.ts                 - Development/production server configuration
+
+build.js                  - Custom build script for proper deployment
 ```
