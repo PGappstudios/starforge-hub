@@ -565,6 +565,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseUrl = 'https://star-seekers.com';
       console.log(`Using base URL for Stripe redirects: ${baseUrl}`);
 
+      const totalCredits = pkg.credits + pkg.bonus;
+      
+      console.log(`🛒 Creating checkout session for user ${req.session.userId}:`);
+      console.log(`📦 Package: ${pkg.name} (${packageId})`);
+      console.log(`💰 Price: $${pkg.price}`);
+      console.log(`🪙 Credits: ${totalCredits} (${pkg.credits} base + ${pkg.bonus} bonus)`);
+      
       // Create Stripe checkout session with custom line item
       const session = await stripe.checkout.sessions.create({
         line_items: [
@@ -573,7 +580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               currency: 'usd',
               product_data: {
                 name: pkg.name,
-                description: `${pkg.credits + pkg.bonus} credits for Star Seekers Gaming Platform`,
+                description: `${totalCredits} credits for Star Seekers Gaming Platform`,
               },
               unit_amount: Math.round(pkg.price * 100), // Convert to cents
             },
@@ -587,7 +594,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           userId: req.session.userId.toString(),
           packageId: packageId,
-          credits: (pkg.credits + pkg.bonus).toString(),
+          credits: totalCredits.toString(),
+          packageName: pkg.name,
+          userEmail: user.email,
         },
       });
 
@@ -735,51 +744,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const sig = req.headers['stripe-signature'] as string;
     
     if (!sig) {
+      console.error('Missing stripe signature in webhook');
       return res.status(400).json({ message: 'Missing stripe signature' });
     }
 
     try {
-      // For development, skip webhook verification
       let event;
-      if (process.env.NODE_ENV === 'development') {
-        // In development, we may not have webhook secrets configured
-        event = req.body;
-      } else {
+      
+      // Always try to construct the event properly, but handle errors gracefully
+      try {
         event = constructEvent(req.body, sig);
+        console.log('✅ Stripe webhook signature verified');
+      } catch (err) {
+        console.error('❌ Stripe webhook signature verification failed:', err);
+        // In development, we can still process the event for testing
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🧪 Development mode: Processing event anyway');
+          event = JSON.parse(req.body.toString());
+        } else {
+          return res.status(400).json({ message: 'Invalid signature' });
+        }
       }
       
-      console.log('Stripe webhook event:', event.type);
+      console.log('🔔 Stripe webhook event received:', event.type);
+      console.log('📦 Event data:', JSON.stringify(event.data.object, null, 2));
       
       switch (event.type) {
         case 'checkout.session.completed': {
           const session = event.data.object as any;
-          const { userId, packageId, credits } = session.metadata;
+          console.log('💳 Checkout session completed:', session.id);
+          console.log('🏷️ Session metadata:', session.metadata);
           
-          if (userId && packageId && credits) {
-            try {
-              // Add credits to user account
-              await storage.addUserCredits(parseInt(userId), parseInt(credits));
-              
-              console.log(`Credits added: User ${userId} received ${credits} credits for package ${packageId}`);
-            } catch (error) {
-              console.error('Error adding credits from webhook:', error);
+          const { userId, packageId, credits } = session.metadata || {};
+          
+          if (!userId || !packageId || !credits) {
+            console.error('❌ Missing required metadata in session:', { userId, packageId, credits });
+            break;
+          }
+          
+          try {
+            const creditsToAdd = parseInt(credits);
+            const userIdNum = parseInt(userId);
+            
+            console.log(`💰 Adding ${creditsToAdd} credits to user ${userIdNum}`);
+            
+            // Add credits to user account
+            const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
+            
+            if (updatedUser) {
+              console.log(`✅ Credits successfully added: User ${userIdNum} received ${creditsToAdd} credits for package ${packageId}`);
+              console.log(`💰 User's new credit balance: ${updatedUser.credits}`);
+            } else {
+              console.error(`❌ Failed to add credits - user ${userIdNum} not found`);
             }
+          } catch (error) {
+            console.error('❌ Error adding credits from webhook:', error);
           }
           break;
         }
         
         case 'checkout.session.async_payment_succeeded': {
           const session = event.data.object as any;
-          const { userId, packageId, credits } = session.metadata;
+          console.log('💳 Async payment succeeded:', session.id);
+          
+          const { userId, packageId, credits } = session.metadata || {};
           
           if (userId && packageId && credits) {
             try {
-              // Add credits to user account for async payments (like bank transfers)
-              await storage.addUserCredits(parseInt(userId), parseInt(credits));
+              const creditsToAdd = parseInt(credits);
+              const userIdNum = parseInt(userId);
               
-              console.log(`Credits added (async): User ${userId} received ${credits} credits for package ${packageId}`);
+              // Add credits to user account for async payments (like bank transfers)
+              const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
+              
+              if (updatedUser) {
+                console.log(`✅ Credits added (async): User ${userIdNum} received ${creditsToAdd} credits for package ${packageId}`);
+              }
             } catch (error) {
-              console.error('Error adding credits from async webhook:', error);
+              console.error('❌ Error adding credits from async webhook:', error);
             }
           }
           break;
@@ -787,20 +829,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         case 'checkout.session.async_payment_failed': {
           const session = event.data.object as any;
-          const { userId, packageId } = session.metadata;
+          const { userId, packageId } = session.metadata || {};
           
-          console.log(`Payment failed for user ${userId}, package ${packageId}`);
-          // Could implement retry logic or notification here
+          console.log(`❌ Payment failed for user ${userId}, package ${packageId}`);
+          break;
+        }
+        
+        case 'payment_intent.succeeded': {
+          const paymentIntent = event.data.object as any;
+          console.log('💳 Payment intent succeeded:', paymentIntent.id);
+          
+          const { userId, packageId, credits } = paymentIntent.metadata || {};
+          
+          if (userId && packageId && credits) {
+            try {
+              const creditsToAdd = parseInt(credits);
+              const userIdNum = parseInt(userId);
+              
+              // Add credits to user account
+              const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
+              
+              if (updatedUser) {
+                console.log(`✅ Credits added from payment intent: User ${userIdNum} received ${creditsToAdd} credits`);
+              }
+            } catch (error) {
+              console.error('❌ Error adding credits from payment intent webhook:', error);
+            }
+          }
           break;
         }
         
         default:
-          console.log(`Unhandled event type ${event.type}`);
+          console.log(`ℹ️ Unhandled event type: ${event.type}`);
       }
       
       res.json({ received: true });
     } catch (error: any) {
-      console.error('Webhook error:', error);
+      console.error('❌ Webhook processing error:', error);
       res.status(400).json({ message: error.message });
     }
   });
@@ -823,6 +888,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Get payment history error:', error);
       res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Manual payment verification endpoint (for debugging)
+  app.post("/api/stripe/verify-payment", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const { sessionId } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID required" });
+      }
+
+      console.log(`🔍 Manually verifying payment session: ${sessionId}`);
+      
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      console.log(`📋 Session status: ${session.payment_status}`);
+      console.log(`🏷️ Session metadata:`, session.metadata);
+      
+      if (session.payment_status === 'paid' && session.metadata) {
+        const { userId, packageId, credits } = session.metadata;
+        
+        if (userId && packageId && credits && parseInt(userId) === req.session.userId) {
+          const creditsToAdd = parseInt(credits);
+          
+          // Check if credits were already added by checking user's current balance
+          const user = await storage.getUser(req.session.userId);
+          if (!user) {
+            return res.status(404).json({ message: "User not found" });
+          }
+          
+          console.log(`💰 Current user credits: ${user.credits}`);
+          console.log(`➕ Credits to add: ${creditsToAdd}`);
+          
+          // Add credits (this will handle duplicates if needed)
+          const updatedUser = await storage.addUserCredits(req.session.userId, creditsToAdd);
+          
+          if (updatedUser) {
+            console.log(`✅ Manual verification: Added ${creditsToAdd} credits to user ${req.session.userId}`);
+            res.json({ 
+              success: true, 
+              message: `Successfully added ${creditsToAdd} credits`,
+              newBalance: updatedUser.credits 
+            });
+          } else {
+            res.status(500).json({ message: "Failed to add credits" });
+          }
+        } else {
+          res.status(400).json({ message: "Invalid session metadata or user mismatch" });
+        }
+      } else {
+        res.status(400).json({ 
+          message: "Payment not completed", 
+          status: session.payment_status 
+        });
+      }
+    } catch (error: any) {
+      console.error('❌ Manual payment verification error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   });
 

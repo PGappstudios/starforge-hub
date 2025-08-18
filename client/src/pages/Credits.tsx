@@ -40,14 +40,41 @@ const Credits = () => {
     const canceled = searchParams.get('canceled');
     const sessionId = searchParams.get('session_id');
 
-    if (success === 'true') {
+    if (success === 'true' && sessionId) {
       toast.success('Payment successful!', {
         description: 'Your credits have been added to your account.',
         duration: 5000,
       });
       
-      // Refresh user data to get updated credits
-      checkAuthStatus();
+      // Verify the payment was processed correctly
+      setTimeout(async () => {
+        try {
+          const response = await fetch('/api/stripe/verify-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ sessionId }),
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Payment verification successful:', result);
+            
+            // Refresh user data to get updated credits
+            checkAuthStatus();
+          } else {
+            console.error('❌ Payment verification failed');
+            toast.error('Payment verification failed', {
+              description: 'Please contact support if credits are missing.',
+              duration: 5000,
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error verifying payment:', error);
+        }
+      }, 2000); // Wait 2 seconds before verification
       
       // Clear URL parameters
       setSearchParams({});
