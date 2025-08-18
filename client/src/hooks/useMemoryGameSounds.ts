@@ -39,7 +39,7 @@ export const useMemoryGameSounds = () => {
 
   const playSound = useCallback((soundRef: React.RefObject<HTMLAudioElement>) => {
     if (audioSettings.muteAll || !soundRef.current) return;
-    
+
     try {
       soundRef.current.currentTime = 0;
       soundRef.current.volume = (audioSettings.sfxVolume / 100) * 0.5;

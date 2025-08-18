@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import QuizGame from '@/components/games/QuizGame';
 import { QuizResult } from '@/types/quiz';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useGameResults } from '@/hooks/useGameResults';
+import { useAudioSettings } from '@/contexts/AudioSettingsContext';
 
 const Game4 = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -15,12 +16,19 @@ const Game4 = () => {
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
+  const { audioSettings } = useAudioSettings();
 
   const GAME_COST = 1;
 
   const handleGameEnd = (result: QuizResult) => {
     setGameResult(result);
     setGameStarted(false);
+
+    if (result.points > 0) {
+      playCorrectSound(); // Play sound for correct answers
+    } else {
+      playGameOverSound(); // Play game over sound if no points
+    }
 
     if (hasPlayedGame) {
       // Submit score to leaderboard
@@ -40,10 +48,20 @@ const Game4 = () => {
     spendCredits(GAME_COST, 'Lore Master - Game Started');
   };
 
-  const playGameOverSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
+  // Sound effects
+  const playCorrectSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game6/correct-6033.mp3');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.5;
+    audio.play().catch(e => console.log('Correct sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
+
+  const playGameOverSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game4/game-over-deep-male-voice-clip-352695.mp3');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.6;
+    audio.play().catch(e => console.log('Game over sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
 
   if (gameStarted) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react"; // Added useCallback import
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,44 @@ const Game2 = () => {
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
 
+  // Assume audioSettings is available and has muteAll and sfxVolume properties
+  // For demonstration, let's define a dummy audioSettings if it's not provided
+  const audioSettings = {
+    muteAll: false,
+    sfxVolume: 100,
+    musicVolume: 100,
+  };
+
   const GAME_COST = 1;
+
+  // Sound effects
+  const playLaserSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game2/enemies/Sounds/laser1.dataset/laser1.mp3');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.3;
+    audio.play().catch(e => console.log('Laser sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
+
+  const playExplosionSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game2/enemies/Sounds/shipexplosion.dataset/shipexplosion.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.5;
+    audio.play().catch(e => console.log('Explosion sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
+
+  const playGameOverSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game2/enemies/Sounds/gameover.dataset/gameover.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.6;
+    audio.play().catch(e => console.log('Game over sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
+
+  const playPowerUpSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game2/enemies/Sounds/powerup.dataset/powerup.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.4;
+    audio.play().catch(e => console.log('PowerUp sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
   return (
     <div className={`min-h-screen ${isPlaying ? 'bg-black' : 'cosmic-bg'}`}>
@@ -120,9 +157,13 @@ const Game2 = () => {
               onGameEnd={(score) => {
                 if (!gameEnded) {
                   setGameEnded(true);
+                  playGameOverSound(); // Re-enabled game over sound
                   // SpaceSnake handles score submission internally via recordGameSessionToAPI
                 }
               }}
+              onLaserFire={playLaserSound} // Added laser sound call
+              onEnemyExplosion={playExplosionSound} // Added explosion sound call
+              onPowerUp={playPowerUpSound} // Added power-up sound call
             />
           </>
         ) : (

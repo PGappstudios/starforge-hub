@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,15 @@ const Game5 = () => {
     // All game sounds disabled - music player controls all audio
     return;
   };
+
+  // Sound effects
+  const playCollectSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game5/Sounds/live.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.4;
+    audio.play().catch(e => console.log('Collect sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 p-4">

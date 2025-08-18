@@ -73,6 +73,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
   const [doubleShotMode, setDoubleShotMode] = useState(false);
   const [doubleShotModeEndTime, setDoubleShotModeEndTime] = useState(0);
   const [lastDoubleShotSpawn, setLastDoubleShotSpawn] = useState(0);
+  const [audioSettings, setAudioSettings] = useState({ muteAll: false, sfxVolume: 50, musicVolume: 50 }); // Placeholder for audio settings
 
   // Function to record game session to API
   const recordGameSessionToAPI = async (score: number) => {
@@ -100,17 +101,17 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
   useEffect(() => {
     const explosionAudio = new Audio('/assets/game1/Sounds/shipexplosion.dataset/shipexplosion.wav');
     explosionAudio.preload = 'auto';
-    explosionAudio.volume = 0.3; // Set reasonable volume
+    explosionAudio.volume = 0.5; // Set reasonable volume
     setExplosionSound(explosionAudio);
 
-    const gameOverAudio = new Audio('/assets/sounds/game-over-deep-male-voice-clip-352695.mp3');
+    const gameOverAudio = new Audio('/assets/game1/Sounds/gameover.dataset/gameover.wav');
     gameOverAudio.preload = 'auto';
-    gameOverAudio.volume = 0.4; // Slightly louder for game over
+    gameOverAudio.volume = 0.6; // Slightly louder for game over
     setGameOverSound(gameOverAudio);
 
     const laserAudio = new Audio('/assets/game1/Sounds/laser1.dataset/laser1.mp3');
     laserAudio.preload = 'auto';
-    laserAudio.volume = 0.2; // Quieter since it plays frequently
+    laserAudio.volume = 0.3; // Quieter since it plays frequently
     setLaserSound(laserAudio);
 
     const liveAudio = new Audio('/assets/game1/Sounds/live.dataset/live.wav');
@@ -120,39 +121,39 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
 
     const powerUpAudio = new Audio('/assets/game1/Sounds/powerup.dataset/powerup.wav');
     powerUpAudio.preload = 'auto';
-    powerUpAudio.volume = 0.3;
+    powerUpAudio.volume = 0.4;
     setPowerUpSound(powerUpAudio);
   }, []);
 
-  // Play explosion sound
-  const playExplosionSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
+  // Sound effects
+  const playLaserSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game1/Sounds/laser1.dataset/laser1.mp3');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.3;
+    audio.play().catch(e => console.log('Laser sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
-  // Play game over sound
-  const playGameOverSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
+  const playExplosionSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game1/Sounds/shipexplosion.dataset/shipexplosion.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.5;
+    audio.play().catch(e => console.log('Explosion sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
-  // Play laser sound
-  const playLaserSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
+  const playGameOverSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game1/Sounds/gameover.dataset/gameover.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.6;
+    audio.play().catch(e => console.log('Game over sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
-  // Play extra life sound
-  const playLiveSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
+  const playPowerUpSound = useCallback(() => {
+    if (audioSettings.muteAll) return;
+    const audio = new Audio('/assets/game1/Sounds/powerup.dataset/powerup.wav');
+    audio.volume = (audioSettings.sfxVolume / 100) * 0.4;
+    audio.play().catch(e => console.log('PowerUp sound failed:', e));
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
-  // Play power-up sound
-  const playPowerUpSound = () => {
-    // All game sounds disabled - music player controls all audio
-    return;
-  };
 
   // Create explosion effect
   const createExplosion = (x: number, y: number, size: 'small' | 'medium' | 'large' = 'medium'): Explosion => {
@@ -1631,7 +1632,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
         }
       }
     }
-  }, [gameState, images, starField, imageError]);
+  }, [gameState, images, starField, imageError, audioSettings.muteAll, audioSettings.sfxVolume]); // Include audio settings in dependency array
 
   // Game loop
   useGameLoop((deltaTime) => {

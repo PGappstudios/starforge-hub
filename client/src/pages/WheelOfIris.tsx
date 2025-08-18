@@ -45,6 +45,13 @@ const DiceOfIris = () => {
   const rollSoundRef = useRef<HTMLAudioElement | null>(null);
   const stopSoundRef = useRef<HTMLAudioElement | null>(null);
 
+  // Placeholder for audio settings, assuming it's available globally or imported
+  // In a real app, you'd likely get this from a context or global state
+  const audioSettings = {
+    muteAll: false, // Example value
+    sfxVolume: 100  // Example value
+  };
+
   // Cooldown checker and countdown timer
   useEffect(() => {
     const checkCooldown = () => {
@@ -122,6 +129,15 @@ const DiceOfIris = () => {
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  // Sound effects
+  const playDiceSound = useCallback(() => {
+    if (!audioSettings.muteAll) {
+      const audio = new Audio('/assets/game6/dice-95077.mp3');
+      audio.volume = (audioSettings.sfxVolume / 100) * 0.5;
+      audio.play().catch(e => console.log('Dice sound failed:', e));
+    }
+  }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
   const rollDice = useCallback(() => {
     if (isRolling || !canRoll) return;
