@@ -62,5 +62,9 @@ app.use((req, res, next) => {
   server.listen(Number(port), "0.0.0.0", () => {
     log(`serving on port ${port}`);
     log(`🎮 StarForge Hub running at http://0.0.0.0:${port}`);
+    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`Database URL configured: ${process.env.DATABASE_URL ? 'Yes' : 'No'}`);
+    log(`Session secret configured: ${process.env.SESSION_SECRET ? 'Yes' : 'No'}`);
+    log(`Stripe configured: ${process.env.STRIPE_SECRET_KEY ? 'Yes' : 'No'}`);
   });
 })();

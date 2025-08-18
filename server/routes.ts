@@ -57,6 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const MemStore = MemoryStore(session);
   
   // Session configuration with in-memory store
+  // Note: For production deployments, consider using a persistent session store
   app.use(session({
     store: new MemStore({
       checkPeriod: 86400000 // prune expired entries every 24h
@@ -66,7 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     saveUninitialized: false,
     name: 'star-seekers-session',
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production' && process.env.REPLIT_DEV_DOMAIN ? false : process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       httpOnly: true,
       sameSite: 'lax'
