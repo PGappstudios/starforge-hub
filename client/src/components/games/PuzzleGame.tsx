@@ -19,7 +19,7 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   const [selectedImage, setSelectedImage] = useState('');
   const [lastImageIndex, setLastImageIndex] = useState(-1);
 
-  // Available puzzle images
+  // Available puzzle images from the actual assets folder
   const puzzleImages = [
     '/assets/game5/Images/STAND.png',
     '/assets/game5/Images/ahr-visits-earth.jpg',
@@ -45,7 +45,32 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
     '/assets/game5/Images/CALMED.jpg',
     '/assets/game5/Images/PD9.jpg',
     '/assets/game5/Images/PX4.jpg',
-    '/assets/game5/Images/FBLEUN.jpg'
+    '/assets/game5/Images/FBLEUN.jpg',
+    '/assets/game5/Images/ARC-6bbaf9dc1208efc7.jpg',
+    '/assets/game5/Images/CALCH-6d3fbf841174a957.jpeg',
+    '/assets/game5/Images/CHI-ed66feaccf1de0f6.jpg',
+    '/assets/game5/Images/FBLAIR-c1ed7b4d8fc0b198.jpg',
+    '/assets/game5/Images/FBLBEA-e1aaa980e0d9c690.jpg',
+    '/assets/game5/Images/FBLBPL-e88853c1706b62b3.jpg',
+    '/assets/game5/Images/FBLEBO-2504e06c45e9b8dc.jpg',
+    '/assets/game5/Images/FBLETR-613cad4903e95b62.jpg',
+    '/assets/game5/Images/FBLEUN-a6fe58fa3eac3f84.jpg',
+    '/assets/game5/Images/HEART-qgksh62rjGIvSNKi.jpg',
+    '/assets/game5/Images/OGKATU-NKEmxNNeG7HSESFJ.jpg',
+    '/assets/game5/Images/PC11-230846ddd5f2ad9d.jpg',
+    '/assets/game5/Images/PC9-eff1c9178647d871.jpg',
+    '/assets/game5/Images/PF4-272c7b400f4ad7b7.jpg',
+    '/assets/game5/Images/PR8-dab0d8b61451c469.jpg',
+    '/assets/game5/Images/PX6-b87a346396f699c9.jpg',
+    '/assets/game5/Images/SUPER-ArVqz6KmaEKY3aCX.jpg',
+    '/assets/game5/Images/SUPER-KRnR0idrdXF5U6SN.jpg',
+    '/assets/game5/Images/SUPER-Zbml25xDVlMyD6FU.jpg',
+    '/assets/game5/Images/SUPER-q2y8pVizRUpmiQ19.jpg',
+    '/assets/game5/Images/SUPER-t22MnLHVACMpwePA.jpg',
+    '/assets/game5/Images/THRILL-6af4675ee14a4338.jpg',
+    '/assets/game5/Images/TUFAFE-40ce6735739c5246.jpg',
+    '/assets/game5/Images/VZUSOP-3b6a9e58f3901f63.jpg',
+    '/assets/game5/Images/VZUSSO-Wtz8vdRONHbv9HSb.jpg'
   ];
 
   const [imageLoaded, setImageLoaded] = useState(false);
