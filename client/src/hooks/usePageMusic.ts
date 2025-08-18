@@ -11,7 +11,7 @@ interface PageMusicConfig {
 const pageMusicConfig: PageMusicConfig = {
   '/': { specificTrack: 'discovery-of-iris.mp3' },
   // Removed leaderboard-specific music; music now only controlled by the global player
-  '/wheel-of-iris': { specificTrack: 'love-story.mp3' },
+  '/dice-of-iris': { specificTrack: 'love-story.mp3' },
 };
 
 export const usePageMusic = () => {

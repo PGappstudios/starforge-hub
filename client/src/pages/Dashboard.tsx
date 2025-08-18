@@ -179,7 +179,7 @@ const Dashboard = () => {
         <div className="text-center">
           <h3 className="text-xl font-futuristic font-bold mb-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">Quick Actions</h3>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/wheel-of-iris">
+            <Link to="/dice-of-iris">
               <Button variant="outline" className="nav-button">
                 <Coins className="w-4 h-4 mr-2" />
                 Earn Credits
