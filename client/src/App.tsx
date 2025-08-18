@@ -47,6 +47,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/dice-of-iris" element={<WheelOfIris />} />
+                  <Route path="/wheel-of-iris" element={<WheelOfIris />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route path="/credits" element={<Credits />} />
                   <Route path="/settings" element={<Settings />} />

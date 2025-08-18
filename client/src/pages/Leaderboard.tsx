@@ -296,7 +296,7 @@ const Leaderboard = () => {
     return (
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         {entries.slice(0, 3).map((entry, index) => (
-          <Card className={`bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 text-center`}>
+          <Card key={entry.id || entry.user.id || index} className={`bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 text-center`}>
             <CardHeader>
               <div className="flex justify-center mb-4">
                 {getRankIcon(entry.rank || index + 1)}

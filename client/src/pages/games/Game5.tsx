@@ -8,6 +8,7 @@ import PuzzleGame from '@/components/games/PuzzleGame';
 import { PuzzleResult } from '@/types/puzzle';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useGameResults } from '@/hooks/useGameResults';
+import { useAudioManager } from '@/hooks/useAudioManager';
 
 const Game5 = () => {
   console.log('Game5 component rendering...');
@@ -17,6 +18,7 @@ const Game5 = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
+  const { audioSettings } = useAudioManager();
 
   const GAME_COST = 1;
 
