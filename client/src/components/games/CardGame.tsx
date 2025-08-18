@@ -22,15 +22,19 @@ const CardGame: React.FC<CardGameProps> = ({ onGameEnd }) => {
 
   const [gameTimer, setGameTimer] = useState<NodeJS.Timeout | null>(null);
   const gameSound = useRef<HTMLAudioElement | null>(null);
+  const gameOverSound = useRef<HTMLAudioElement | null>(null);
 
   // Card suits and ranks for deck generation
   const suits: PlayingCard['suit'][] = ['hearts', 'diamonds', 'clubs', 'spades'];
   const ranks: PlayingCard['rank'][] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-  // Initialize sound
+  // Initialize sounds
   useEffect(() => {
     gameSound.current = new Audio('/assets/game1/Sounds/live.wav'); // Using existing sound
     gameSound.current.volume = 0.3;
+    
+    gameOverSound.current = new Audio('/assets/sounds/game-over-deep-male-voice-clip-352695.mp3');
+    gameOverSound.current.volume = 0.7;
   }, []);
 
   // Game timer effect
@@ -105,6 +109,11 @@ const CardGame: React.FC<CardGameProps> = ({ onGameEnd }) => {
 
   const handleTimeUp = () => {
     console.log('Time is up!');
+    // Play game over sound
+    if (gameOverSound.current) {
+      gameOverSound.current.currentTime = 0;
+      gameOverSound.current.play().catch(e => console.log('Game over sound failed:', e));
+    }
     setGameState(prev => ({ ...prev, gameStatus: 'gameOver' }));
     const result: CardGameResult = {
       completed: false,

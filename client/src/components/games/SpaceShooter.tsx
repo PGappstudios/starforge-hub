@@ -142,7 +142,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
 
   const playGameOverSound = useCallback(() => {
     if (audioSettings.muteAll) return;
-    const audio = new Audio('/assets/game1/Sounds/gameover.dataset/gameover.wav');
+    const audio = new Audio('/assets/sounds/game-over-deep-male-voice-clip-352695.mp3');
     audio.volume = (audioSettings.sfxVolume / 100) * 0.6;
     audio.play().catch(e => console.log('Game over sound failed:', e));
   }, [audioSettings.muteAll, audioSettings.sfxVolume]);

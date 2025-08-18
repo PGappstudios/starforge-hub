@@ -60,13 +60,7 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   const [imagePieces, setImagePieces] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const correctPieceSound = useRef<HTMLAudioElement | null>(null);
-
-  // New game features
-  const [level, setLevel] = useState(1);
-  const [score, setScore] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(120); // 2 minutes in seconds
-  const [gameTimer, setGameTimer] = useState<NodeJS.Timeout | null>(null);
-  const [lastImageIndex, setLastImageIndex] = useState(-1); // Track last used image to avoid repeats
+  const gameOverSound = useRef<HTMLAudioElement | null>(null);
 
   // Game session recording state
   const [gameStartTime, setGameStartTime] = useState<number>(0);
@@ -92,9 +86,11 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
   };
 
   useEffect(() => {
-    // Initialize sound
+    // Initialize sounds
     correctPieceSound.current = new Audio('/assets/game5/Sounds/live.wav');
     correctPieceSound.current.volume = 0.3; // Set volume to 30%
+    gameOverSound.current = new Audio('/assets/sounds/game-over-deep-male-voice-clip-352695.mp3');
+
 
     let interval: NodeJS.Timeout;
     if (gameStatus === 'preview' && previewTimeLeft > 0) {
@@ -143,6 +139,10 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
     };
     recordGameSessionToAPI(score); // Record score even if time runs out
     onGameEnd?.(result);
+    // Play game over sound
+    if (gameOverSound.current) {
+      gameOverSound.current.play().catch(e => console.log('Game over sound play failed:', e));
+    }
   };
 
   const handleStartGame = () => {

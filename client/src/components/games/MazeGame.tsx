@@ -1450,10 +1450,10 @@ const MazeGame: React.FC<MazeGameProps> = ({ onGameEnd, onGameStateChange }) => 
       if (distance < collisionDistance) {
         // Enemy kills player
         state.gameStatus = 'gameOver';
-        
+
         // Record game session before changing state and potentially unmounting
         recordGameSessionToAPI(state.score); 
-        
+
         playGameOverSound();
         onGameStateChange?.(false);
         console.log('Game Over! Enemy caught the player');
