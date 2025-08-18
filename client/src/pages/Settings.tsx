@@ -44,7 +44,6 @@ const Settings = () => {
 
   // Profile Settings (synced with user data)
   const [selectedFaction, setSelectedFaction] = useState<"oni" | "mud" | "ustur">(user?.faction || "oni");
-  const [email, setEmail] = useState(user?.email || "");
   const [solanaWallet, setSolanaWallet] = useState(user?.solanaWallet || "");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -52,7 +51,6 @@ const Settings = () => {
   useEffect(() => {
     if (user) {
       setSelectedFaction(user.faction || "oni");
-      setEmail(user.email || "");
       setSolanaWallet(user.solanaWallet || "");
     }
   }, [user]);
@@ -95,13 +93,11 @@ const Settings = () => {
     try {
       console.log('Attempting to save profile:', { 
         faction: selectedFaction,
-        email: email.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
       await updateProfile({ 
         faction: selectedFaction,
-        email: email.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
@@ -136,7 +132,6 @@ const Settings = () => {
 
   const handleResetSettings = () => {
     setSelectedFaction(user.faction || "oni");
-    setEmail(user.email || "");
     setSolanaWallet(user.solanaWallet || "");
     setShowIntroVideo(true);
     // Reset audio settings to default as well
@@ -258,11 +253,11 @@ const Settings = () => {
                       <Input
                         id="email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email address"
-                        className="bg-black/10 border-white/20"
+                        value={user.email}
+                        disabled
+                        className="bg-black/10 border-white/20 opacity-60"
                       />
+                      <p className="text-xs text-white/60">Email address cannot be changed</p>
                     </div>
 
                     <div className="space-y-2">
@@ -279,7 +274,7 @@ const Settings = () => {
 
                     <Button 
                       onClick={handleSaveProfile} 
-                      disabled={isSaving || (user.faction === selectedFaction && user.email === email && user.solanaWallet === solanaWallet)}
+                      disabled={isSaving || (user.faction === selectedFaction && user.solanaWallet === solanaWallet)}
                       className="w-full nav-button"
                     >
                       {isSaving ? "Updating..." : "Update Profile"}
