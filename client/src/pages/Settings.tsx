@@ -44,6 +44,7 @@ const Settings = () => {
 
   // Profile Settings (synced with user data)
   const [selectedFaction, setSelectedFaction] = useState<"oni" | "mud" | "ustur">(user?.faction || "oni");
+  const [username, setUsername] = useState(user?.username || "");
   const [solanaWallet, setSolanaWallet] = useState(user?.solanaWallet || "");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -51,6 +52,7 @@ const Settings = () => {
   useEffect(() => {
     if (user) {
       setSelectedFaction(user.faction || "oni");
+      setUsername(user.username || "");
       setSolanaWallet(user.solanaWallet || "");
     }
   }, [user]);
@@ -93,11 +95,13 @@ const Settings = () => {
     try {
       console.log('Attempting to save profile:', { 
         faction: selectedFaction,
+        username: username.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
       await updateProfile({ 
         faction: selectedFaction,
+        username: username.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
@@ -132,6 +136,7 @@ const Settings = () => {
 
   const handleResetSettings = () => {
     setSelectedFaction(user.faction || "oni");
+    setUsername(user.username || "");
     setSolanaWallet(user.solanaWallet || "");
     setShowIntroVideo(true);
     // Reset audio settings to default as well
@@ -186,11 +191,11 @@ const Settings = () => {
                       <Label htmlFor="username" className="font-futuristic">Username</Label>
                       <Input
                         id="username"
-                        value={user.username}
-                        disabled
-                        className="bg-black/10 border-white/20 opacity-60"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter your username"
+                        className="bg-black/10 border-white/20"
                       />
-                      <p className="text-xs text-white/60">Username cannot be changed</p>
                     </div>
 
                     <div className="space-y-4">
@@ -274,7 +279,7 @@ const Settings = () => {
 
                     <Button 
                       onClick={handleSaveProfile} 
-                      disabled={isSaving || (user.faction === selectedFaction && user.solanaWallet === solanaWallet)}
+                      disabled={isSaving || (user.faction === selectedFaction && user.username === username && user.solanaWallet === solanaWallet)}
                       className="w-full nav-button"
                     >
                       {isSaving ? "Updating..." : "Update Profile"}
