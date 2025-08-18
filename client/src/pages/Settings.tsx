@@ -29,7 +29,7 @@ import {
 
 const Settings = () => {
   // Authentication
-  const { user, isLoading, updateProfile } = useAuth();
+  const { user, isAuthenticated, isLoading, updateProfile } = useAuth();
   const { toast } = useToast();
 
   // Settings Context
