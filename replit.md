@@ -78,3 +78,8 @@ The server expects static files at `dist/public/` and serves them using Express 
 - **Removed Discord OAuth**: Simplified authentication to use only email/password login for better user experience.
 - **Streamlined Auth Flow**: Users now register and sign in using traditional email/password authentication.
 - **Clean Authentication UI**: Removed Discord login buttons and OAuth integration from the authentication form.
+
+### Deployment Configuration Fixes
+- **Port Configuration**: Updated server to properly use PORT environment variable for deployment (port 80) while maintaining development compatibility (port 5000).
+- **Environment Handling**: Improved production environment detection and configuration handling.
+- **Production Readiness**: Server now properly configured for Replit deployment with correct port mapping.
