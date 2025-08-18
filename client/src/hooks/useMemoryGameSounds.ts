@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useAudioManager } from '@/contexts/AudioManagerContext';
 
 export const useMemoryGameSounds = () => {
   const { audioSettings } = useAudioManager();

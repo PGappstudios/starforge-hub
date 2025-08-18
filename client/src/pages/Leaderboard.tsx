@@ -352,7 +352,10 @@ const Leaderboard = () => {
       <div className="container mx-auto px-4 py-8">
         {showAuthForm && !user ? (
           <div className="flex justify-center items-center h-[70vh]">
-            <AuthForm />
+            <AuthForm 
+              onAuthSuccess={() => setShowAuthForm(false)}
+              onClose={() => setShowAuthForm(false)}
+            />
           </div>
         ) : (
           <>

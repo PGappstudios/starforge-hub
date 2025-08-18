@@ -1,233 +1,45 @@
 # Star Seekers Gaming Platform
 
-## Project Overview
-This is a comprehensive full-stack JavaScript application featuring 6 games with an in-memory leaderboard system. The project uses React with TypeScript for the frontend, Express.js for the backend, and in-memory storage for session data.
-
-## Architecture
-
-### Storage System
-The application uses PostgreSQL database with the following data structures:
-
-1. **users** - User accounts and profiles with authentication and direct registration
-2. **Individual Game Leaderboards** - Separate tables for each game:
-   - **game1_leaderboard** - Asteroid Blaster leaderboard
-   - **game2_leaderboard** - Space Snake leaderboard
-   - **game3_leaderboard** - Star Wars leaderboard
-   - **game4_leaderboard** - Cosmic Defense leaderboard
-   - **game5_leaderboard** - Galaxy Runner leaderboard
-   - **game6_leaderboard** - Nebula Navigator leaderboard
-3. **global_leaderboards** - Overall rankings that persist permanently
-
-### Leaderboard Structure
-- **6 Individual Game Leaderboards** (1 per game)
-  - Monthly leaderboards (reset every month)
-  - Yearly leaderboards (reset every year)
-- **1 Global Leaderboard** (combines all points during session)
-
-Total: 13 leaderboards (6 games × 2 periods + 1 global)
-
-### Games Implemented
-1. **Cosmic Battle Arena** (Space Shooter) - `/game1`
-2. **Stellar Mining** (Snake) - `/game2`  
-3. **Space Traders** (Memory Cards) - `/game3`
-4. **Lore Master** (Quiz) - `/game4`
-5. **Star Seekers Puzzle** (Sliding Puzzle) - `/game5`
-6. **Cargo Runner** (Maze/Pac-man style) - `/game6`
-
-## API Endpoints
-
-### Leaderboard APIs
-- `POST /api/games/score` - Record game score to individual leaderboard
-- `GET /api/leaderboard/global` - Get global leaderboard
-- `GET /api/leaderboard/game/:gameId?type=monthly|yearly` - Get game-specific leaderboard
-- `GET /api/leaderboard/position` - Get user's current position
-- Removed: `/api/user/sessions` - Game session tracking removed
-- `GET /api/games/config` - Get games configuration
-
-### User APIs
-- `POST /api/register` - Direct user registration with immediate account creation
-- `POST /api/login` - User login
-- `GET /api/user` - Get current user
-- `PUT /api/user/profile` - Update user profile
-
-## Key Features
-
-### Leaderboard System Features
-- **Automatic Period Management**: Monthly/yearly periods are automatically calculated and managed
-- **Real-time Updates**: Leaderboards update immediately when games are completed
-- **Multiple Ranking Types**: Score-based for individual games, points-based for global
-- **User Position Tracking**: Users can see their current rank in any leaderboard
-- **Faction Statistics**: Aggregate statistics by user faction (oni, mud, ustur)
-
-### Reset Logic
-- **Monthly Leaderboards**: Reset on the 1st of each month
-- **Yearly Leaderboards**: Reset on January 1st  
-- **Global Leaderboard**: Never resets (permanent hall of fame)
-
-## Usage for Games
-
-Games should use the utility functions in `client/src/utils/gameLeaderboard.ts`:
-
-```typescript
-import { recordGameSession } from '@/utils/gameLeaderboard';
-
-// When a game ends
-await recordGameSession({
-  gameId: 1,           // 1-6 for each game
-  score: finalScore,   // Player's score in this session
-  points: earnedPoints,// Points earned (can be calculated)
-  duration: playTime   // Optional: game duration in seconds
-});
-```
-
-## Data Management
-
-### PostgreSQL Database
-All data is persistently stored in a PostgreSQL database using Neon serverless. Data remains available between server restarts and deployments.
-
-### Default Users
-- TestUser (id: 1) - 150 points, oni faction
-- PG (id: 2) - 250 points, mud faction
+## Overview
+Star Seekers is a full-stack JavaScript gaming platform featuring six distinct games and a persistent, multi-tiered leaderboard system. The project's core purpose is to provide an engaging gaming experience with competitive elements, leveraging a React with TypeScript frontend and an Express.js backend. The platform aims to offer a robust and scalable solution for online gaming with a focus on user engagement through score-based competition and real-time ranking.
 
 ## User Preferences
 - Language: Simple, everyday language for non-technical users
 - Focus: Complete, working solutions over quick implementations
 - Communication: Calm, supportive tone without excessive technical details
 
-## Recent Changes
+## System Architecture
 
-### 2025-08-18: Fixed Stripe Payment Processing System
-- **Payment Processing Fixed**: Resolved Stripe price ID errors by switching from hardcoded Price IDs to dynamic price_data
-- **Custom Line Items**: Updated checkout sessions to use Stripe's price_data feature instead of predefined products
-- **Enhanced Credit Packages**: Added Champion Pack (500 + 100 bonus credits for $19.99)
-- **Updated Package Structure**: 
-  - Starter Pack: 100 credits, $4.99
-  - Gamer Pack: 250 + 50 bonus credits, $9.99  
-  - Champion Pack: 500 + 100 bonus credits, $19.99
-- **Improved Error Handling**: Enhanced payment error logging and user feedback
-- **Webhook System**: Verified webhook handling for payment confirmations working correctly
-- **Environment Variables**: Successfully configured VITE_STRIPE_PUBLISHABLE_KEY and STRIPE_WEBHOOK_SECRET
-- **Frontend Updates**: Updated fallback packages in Credits page to match new structure
-- **Testing Confirmed**: Payment flow tested successfully with checkout session creation
-- **Production Redirects**: Updated Stripe redirect URLs to point to https://star-seekers.com/credits for seamless user experience
+### UI/UX Decisions
+The frontend features a tabbed interface for navigation between global and game-specific leaderboards, a game selector, monthly/yearly toggles, a top 3 podium display, user highlighting, and a faction statistics dashboard. Real-time loading states and comprehensive error handling are integrated.
 
-### 2025-08-18: Deployment Fix - Build Directory Structure Resolution
-- **Deployment Issue Resolved**: Fixed build process that was causing deployment failures
-- **Root Cause**: Server expects static files in `dist/public/` but default build process puts them in `client/dist/`
-- **Solution Implemented**: Custom build.js script properly creates the required directory structure
-- **Build Process**: `node build.js` command creates proper `dist/public/` structure with static files
-- **Server Compatibility**: Fixed `serveStatic` function in server/vite.ts to correctly serve from `dist/public/`
-- **Package.json Constraint**: Cannot modify package.json build script due to system restrictions
-- **Deployment Instructions**: For proper deployment, use `node build.js` instead of `npm run build`
-- **Directory Structure Created**: 
-  - `dist/index.js` (server file)
-  - `dist/public/` (static files including index.html, assets, etc.)
-- **Deployment Ready**: Application now builds correctly for production deployment with proper file structure
+### Technical Implementations
+The application utilizes a React frontend with TypeScript for type safety and maintainability. The backend is built with Express.js, providing a robust API layer. Persistent data storage is handled by a PostgreSQL database.
 
-### 2025-08-14: Real Stripe Payment Integration with Price IDs
-- **Complete Stripe Overhaul**: Implemented real Stripe Payment Intents API using Price IDs
-- **Customer Management**: Added stripeCustomerId field to users table for proper Stripe integration
-- **Simplified Payment API**: Now only requires packageId, automatic price/credits calculation
-- **Database Schema Update**: Added stripe_customer_id column to PostgreSQL users table
-- **Payment Tracking**: All transactions properly stored with complete audit trail
-- **Credit Package Adjustment**: Fixed Gamer Pack to provide exactly 250 credits (removed 50 bonus)
-- **Test Mode Validation**: Confirmed both Starter Pack (100 credits) and Gamer Pack (250 credits) working perfectly
-- **Frontend Integration**: Updated StripeCheckout component to work with simplified backend API
-- **Environment Support**: Ready for production with real Stripe Price IDs when environment variables set
+### Feature Specifications
+- **Leaderboard System**:
+    - **Individual Game Leaderboards**: Six separate leaderboards, one for each game, with monthly and yearly resets.
+    - **Global Leaderboard**: A permanent, never-resetting leaderboard combining overall player points.
+    - **Automatic Period Management**: Monthly and yearly periods are automatically calculated and managed.
+    - **Real-time Updates**: Leaderboards update instantly upon game completion.
+    - **Multiple Ranking Types**: Score-based for individual games, points-based for global.
+    - **User Position Tracking**: Users can view their current rank across all leaderboards.
+    - **Faction Statistics**: Aggregated statistics are available by user faction (oni, mud, ustur).
+- **User Management**: Direct user registration and authentication, with profile updates.
+- **Game Integration**: Games interact with the leaderboard system via a utility function (`recordGameSession`) to submit scores and points.
+- **Credit System**: Integration with Stripe for payment processing to purchase in-game credits, featuring different credit packages.
 
-### 2025-08-13: PostgreSQL Database Fully Operational
-- **Database Integration Complete**: Successfully integrated PostgreSQL database using Neon serverless
-- **All Tables Created**: Users, global_leaderboards, and individual game leaderboard tables (game1-game6)
-- **Storage Layer Active**: DatabaseStorage class properly implemented and tested
-- **API Endpoints Verified**: All leaderboard and user management APIs working with live database
-- **Data Persistence Confirmed**: User registration, game scores, and rankings now permanently stored
-- **TypeScript Issues Resolved**: Fixed schema type definitions for better compatibility
-- **Test Data Validated**: Created test users and leaderboard entries, confirmed proper data retrieval
-- **Environment Setup**: DATABASE_URL and PostgreSQL environment variables properly configured
+### System Design Choices
+- **Storage System**: All persistent data, including user accounts, profiles, and all leaderboard data (individual game, monthly, yearly, and global), is stored in a PostgreSQL database. This ensures data persistence across server restarts and deployments.
+- **API Endpoints**: A structured API provides endpoints for:
+    - Recording game scores (`POST /api/games/score`)
+    - Retrieving global and game-specific leaderboards (`GET /api/leaderboard/global`, `GET /api/leaderboard/game/:gameId`)
+    - Getting a user's leaderboard position (`GET /api/leaderboard/position`)
+    - User authentication and profile management (`POST /api/register`, `POST /api/login`, `GET /api/user`, `PUT /api/user/profile`)
+    - Retrieving game configuration (`GET /api/games/config`)
+- **Build Process**: A custom `build.js` script is used for production builds to ensure the correct directory structure (`dist/public/` for static assets and `dist/index.js` for the server) for deployment.
 
-### 2025-08-11: PostgreSQL Database Integration & Individual Game Leaderboards
-- **Database Addition**: Successfully integrated PostgreSQL database using Neon serverless
-- **Schema Migration**: Created comprehensive Drizzle ORM schemas for all data structures
-- **Database Tables Created**: Users, global_leaderboards, game_sessions, user_registrations, individual game leaderboards
-- **Individual Game Leaderboards**: Created separate tables for each of the 6 games (game1_leaderboard through game6_leaderboard)
-- **Game-Specific Storage**: Each game now has its own dedicated leaderboard table with proper indexing for performance
-- **User Registration System**: Created user registration table and API endpoints for managing user sign-ups
-- **Registration Fields**: Username, email, faction, and Solana wallet address with pending/approved/rejected status
-- **Storage Implementation**: Replaced in-memory storage with DatabaseStorage class using Drizzle queries
-- **API Enhancements**: Added individual game leaderboard support with ?individual=true parameter
-- **Legacy Code Cleanup**: Removed obsolete game_leaderboards table and all related references from codebase
-- **Code Refactoring**: Cleaned up imports, types, and methods that referenced the old combined leaderboard system
-- **User System Simplification**: Removed user_registrations table and approval workflow, simplified to direct user registration
-- **Registration Streamlining**: Consolidated to single /api/register endpoint for immediate account creation
-- **Game Session Removal**: Removed game_sessions table and all session tracking functionality
-- **Code Cleanup**: Removed session-related API endpoints and storage methods
-- **API Endpoints Added**: POST /api/user/register, GET /api/admin/registrations, PUT /api/admin/registrations/:id/status
-- **Environment Setup**: Configured DATABASE_URL and other PostgreSQL environment variables
-- **Data Persistence**: All user data, game sessions, leaderboards, and registrations now persist in database
-- **Test Data Migration**: Successfully migrated test users (TestUser, PG) to database
-- **Dependencies Added**: Installed @neondatabase/serverless, drizzle-orm, drizzle-kit, drizzle-zod
-- **Performance Optimization**: Added proper indexes on user_id, score, and period fields for all game leaderboard tables
-- **API Testing**: Successfully tested individual game leaderboards with sample data for all 6 games
-- **Database Verification**: Confirmed old game_leaderboards table removed and individual tables working correctly
+## External Dependencies
 
-### Previous: Database Removal & In-Memory Storage Migration (Reversed)
-- Previous in-memory implementation has been completely replaced with PostgreSQL database
-- All storage operations now use authentic database queries instead of memory-based data
-
-### Previous: Application Debugging & Video Intro Enhancement
-- **Fixed Application Startup Issues**: Resolved LSP errors in server routes and CreditsContext
-- **Enhanced Video Intro**: Set video duration to exactly 1 minute 18 seconds with automatic redirect
-- **Auto-Navigation Logic**: Video automatically closes and redirects based on authentication status
-- **Updated Starting Credits**: Changed default credits for new users from 100 to 10
-- **Leaderboard System**: Implemented monthly/yearly leaderboards with global Hall of Fame
-- **Point Breakdown Feature**: Added API endpoint for detailed user game breakdown
-- **Game Integration Utilities**: Created utility functions for easy game integration
-
-### Frontend Features
-- Tabbed interface: Global Hall of Fame vs Game Leaderboards
-- Game selector for viewing specific game rankings
-- Monthly/Yearly toggle for each game
-- Top 3 podium display for champions
-- User highlighting (current user gets special styling)
-- Faction statistics dashboard
-- Real-time loading states and error handling
-
-## Deployment Instructions
-
-### For Production Deployment
-**Important**: Use the custom build script for proper deployment:
-
-```bash
-# Correct build command for deployment
-node build.js
-
-# This creates the proper directory structure:
-# dist/
-# ├── public/           # Static files (HTML, CSS, JS, assets)
-# │   ├── index.html
-# │   ├── assets/
-# │   └── ...other static files
-# └── index.js         # Built server file
-```
-
-**Do NOT use**: `npm run build` - This creates an incorrect directory structure that causes deployment failures.
-
-### Deployment Process
-1. Run `node build.js` to build for production
-2. Deploy the `dist/` directory 
-3. The server will correctly serve static files from `dist/public/`
-4. Server runs from `dist/index.js`
-
-## Project Structure
-```
-client/src/
-  pages/Leaderboard.tsx     - Main leaderboard interface
-  utils/gameLeaderboard.ts  - Game integration utilities
-  
-server/
-  storage.ts               - Database storage operations (PostgreSQL)
-  routes.ts               - API endpoints and validation schemas
-  vite.ts                 - Development/production server configuration
-
-build.js                  - Custom build script for proper deployment
-```
+- **PostgreSQL**: Used for all persistent data storage, including users, game-specific leaderboards, and the global leaderboard. Utilizes Neon serverless for database hosting.
+- **Stripe**: Integrated for payment processing, specifically for handling in-game credit purchases using Payment Intents API and `price_data` for custom line items.

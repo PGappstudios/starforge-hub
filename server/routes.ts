@@ -1017,7 +1017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             try {
               await storage.createPayment({
                 userId: userIdNum,
-                stripePaymentIntentId: session.payment_intent || session.id,
+                stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : session.id,
                 packageId,
                 packageName: packageId,
                 amount: creditsToAdd,

@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   // Serve the app on port 5000 for Replit deployment
   // this serves both the API and the client.
   const port = process.env.PORT || 5000;
-  server.listen(port, "0.0.0.0", () => {
+  server.listen(Number(port), "0.0.0.0", () => {
     log(`serving on port ${port}`);
     log(`🎮 StarForge Hub running at http://0.0.0.0:${port}`);
   });

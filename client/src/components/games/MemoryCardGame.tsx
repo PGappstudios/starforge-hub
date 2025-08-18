@@ -57,7 +57,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
   };
 
   const { images, loading, error, reloadImages } = useMemoryImageLoader(12);
-  const { playCardFlip, playGameStart, playGameOver, playLevelComplete } = useMemoryGameSounds();
+  const { playFlipSound, playGameStartSound, playGameOverSound, playLevelCompleteSound } = useMemoryGameSounds();
 
   const createCards = useCallback(() => {
     if (images.length === 0) return [];
@@ -91,7 +91,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
 
   const startNewGame = useCallback(() => {
     const newCards = createCards();
-    playGameStart();
+    playGameStartSound();
     const initialTime = 180;
     setGameState({
       cards: newCards,
@@ -105,7 +105,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
       maxTimeForLevel: initialTime
     });
     onGameStateChange?.(true);
-  }, [createCards, onGameStateChange, playGameStart]);
+  }, [createCards, onGameStateChange, playGameStartSound]);
 
   const pauseGame = () => {
     setGameState(prev => ({
@@ -168,7 +168,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
           if (newTimeRemaining <= 0) {
             console.log('Game timeout - setting to lost'); // Debug log
             setTimeout(() => {
-              playGameOver();
+              playGameOverSound();
               recordGameSessionToAPI(prev.score);
               onGameEnd?.(prev.score);
               onGameStateChange?.(false);
@@ -212,7 +212,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
     const card = gameState.cards.find(c => c.id === cardId);
     if (!card || card.isFlipped || card.isMatched) return;
 
-    playCardFlip();
+    playFlipSound();
     const newFlippedCards = [...gameState.flippedCards, cardId];
 
     setGameState(prev => ({
@@ -255,7 +255,7 @@ const MemoryCardGame = ({ onGameStateChange, onGameEnd }: MemoryCardGameProps) =
         // Check for level complete condition
         if (newMatchedPairs === 12) {
           setTimeout(() => {
-            playLevelComplete();
+            playLevelCompleteSound();
             setGameState(prev => {
               const finalScore = prev.score + 100 + prev.timeRemaining;
               recordGameSessionToAPI(finalScore);

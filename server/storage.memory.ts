@@ -80,6 +80,7 @@ export class MemoryStorage {
       gamesPlayed: 0,
       achievements: 0,
       credits: 10,
+      stripeCustomerId: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
