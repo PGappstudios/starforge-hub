@@ -194,16 +194,16 @@ const Settings = () => {
                             key={faction.id}
                             onClick={() => setSelectedFaction(faction.id)}
                             className={cn(
-                              "relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 text-center transform hover:scale-105",
+                              "relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 text-center transform hover:scale-105 backdrop-blur-md",
                               selectedFaction === faction.id 
                                 ? "ring-2 ring-white/50 shadow-lg" 
                                 : "border-white/20 hover:border-white/40",
                               faction.id === "oni" && selectedFaction === faction.id && "border-blue-500 bg-blue-500/20",
-                              faction.id === "oni" && selectedFaction !== faction.id && "hover:border-blue-500/50 hover:bg-blue-500/5",
+                              faction.id === "oni" && selectedFaction !== faction.id && "hover:border-blue-500/50 hover:bg-blue-500/5 bg-black/10",
                               faction.id === "mud" && selectedFaction === faction.id && "border-green-500 bg-green-500/20",
-                              faction.id === "mud" && selectedFaction !== faction.id && "hover:border-green-500/50 hover:bg-green-500/5",
+                              faction.id === "mud" && selectedFaction !== faction.id && "hover:border-green-500/50 hover:bg-green-500/5 bg-black/10",
                               faction.id === "ustur" && selectedFaction === faction.id && "border-purple-500 bg-purple-500/20",
-                              faction.id === "ustur" && selectedFaction !== faction.id && "hover:border-purple-500/50 hover:bg-purple-500/5"
+                              faction.id === "ustur" && selectedFaction !== faction.id && "hover:border-purple-500/50 hover:bg-purple-500/5 bg-black/10"
                             )}
                           >
                             <FactionAvatar faction={faction.id} size="lg" className="mx-auto mb-3" />
