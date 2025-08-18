@@ -8,7 +8,7 @@ import QuizGame from '@/components/games/QuizGame';
 import { QuizResult } from '@/types/quiz';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useGameResults } from '@/hooks/useGameResults';
-import { useAudioSettings } from '@/contexts/AudioSettingsContext';
+import { useAudioManager } from '@/contexts/AudioManagerContext';
 
 const Game4 = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -16,7 +16,7 @@ const Game4 = () => {
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
-  const { audioSettings } = useAudioSettings();
+  const { audioSettings } = useAudioManager();
 
   const GAME_COST = 1;
 
