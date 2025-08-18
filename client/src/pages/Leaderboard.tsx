@@ -449,7 +449,11 @@ const Leaderboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
-                          {globalLeaderboard.map((entry) => renderGlobalLeaderboardEntry(entry))}
+                          {globalLeaderboard.map((entry, index) => (
+                            <div key={entry.id || entry.user.id || index}>
+                              {renderGlobalLeaderboardEntry(entry)}
+                            </div>
+                          ))}
                         </div>
                       </CardContent>
                     </Card>
@@ -522,7 +526,11 @@ const Leaderboard = () => {
                               </p>
                             </div>
                             <div className="space-y-3">
-                              {monthlyLeaderboard.map((entry) => renderGameLeaderboardEntry(entry, true))}
+                              {monthlyLeaderboard.map((entry, index) => (
+                                <div key={entry.id || entry.user.id || index}>
+                                  {renderGameLeaderboardEntry(entry, true)}
+                                </div>
+                              ))}
                             </div>
                           </>
                         ) : (
@@ -546,7 +554,11 @@ const Leaderboard = () => {
                               </p>
                             </div>
                             <div className="space-y-3">
-                              {yearlyLeaderboard.map((entry) => renderGameLeaderboardEntry(entry, true))}
+                              {yearlyLeaderboard.map((entry, index) => (
+                                <div key={entry.id || entry.user.id || index}>
+                                  {renderGameLeaderboardEntry(entry, true)}
+                                </div>
+                              ))}
                             </div>
                           </>
                         ) : (

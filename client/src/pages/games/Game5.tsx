@@ -8,7 +8,7 @@ import PuzzleGame from '@/components/games/PuzzleGame';
 import { PuzzleResult } from '@/types/puzzle';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useGameResults } from '@/hooks/useGameResults';
-import { useAudioManager } from '@/hooks/useAudioManager';
+import { useAudioManager } from '@/contexts/AudioManagerContext';
 
 const Game5 = () => {
   console.log('Game5 component rendering...');

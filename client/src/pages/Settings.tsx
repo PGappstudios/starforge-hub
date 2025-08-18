@@ -95,13 +95,11 @@ const Settings = () => {
     try {
       console.log('Attempting to save profile:', { 
         faction: selectedFaction,
-        username: username.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
       await updateProfile({ 
         faction: selectedFaction,
-        username: username.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
 
@@ -258,7 +256,7 @@ const Settings = () => {
                       <Input
                         id="email"
                         type="email"
-                        value={user.email}
+                        value={user.email || ""}
                         disabled
                         readOnly
                         className="bg-black/10 border-white/20 opacity-60 cursor-not-allowed"
