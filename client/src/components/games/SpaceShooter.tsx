@@ -1192,7 +1192,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
 
           if (powerUp.type === 'extraLife') {
             newState.lives += 1;
-            playLiveSound();
+            playPowerUpSound();
           } else if (powerUp.type === 'missiles') {
             setMissileMode(true);
             setMissileModeEndTime(currentTime + 10000); // 10 seconds

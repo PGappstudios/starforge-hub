@@ -9,6 +9,7 @@ import { QuizResult } from '@/types/quiz';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useGameResults } from '@/hooks/useGameResults';
 import { useAudioManager } from '@/contexts/AudioManagerContext';
+import { playGameSound } from '@/utils/audioFallback';
 
 const Game4 = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -48,19 +49,17 @@ const Game4 = () => {
     spendCredits(GAME_COST, 'Lore Master - Game Started');
   };
 
-  // Sound effects
-  const playCorrectSound = useCallback(() => {
+  // Sound effects with improved deployment handling
+  const playCorrectSound = useCallback(async () => {
     if (audioSettings.muteAll) return;
-    const audio = new Audio('/assets/game6/correct-6033.mp3');
-    audio.volume = (audioSettings.sfxVolume / 100) * 0.5;
-    audio.play().catch(e => console.log('Correct sound failed:', e));
+    const volume = (audioSettings.sfxVolume / 100) * 0.5;
+    await playGameSound('/assets/game6/correct-6033.mp3', volume);
   }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
-  const playGameOverSound = useCallback(() => {
+  const playGameOverSound = useCallback(async () => {
     if (audioSettings.muteAll) return;
-    const audio = new Audio('/assets/game4/game-over-deep-male-voice-clip-352695.mp3');
-    audio.volume = (audioSettings.sfxVolume / 100) * 0.6;
-    audio.play().catch(e => console.log('Game over sound failed:', e));
+    const volume = (audioSettings.sfxVolume / 100) * 0.6;
+    await playGameSound('/assets/game4/game-over-deep-male-voice-clip-352695.mp3', volume);
   }, [audioSettings.muteAll, audioSettings.sfxVolume]);
 
 
