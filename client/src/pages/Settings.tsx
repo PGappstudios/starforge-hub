@@ -123,7 +123,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen cosmic-bg">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -151,7 +151,7 @@ const Settings = () => {
             {/* Profile Settings */}
             <TabsContent value="profile">
               <div className="grid lg:grid-cols-2 gap-8">
-                <Card className="game-card">
+                <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
                   <CardHeader>
                     <CardTitle className="font-futuristic text-2xl flex items-center gap-3">
                       <User className="w-6 h-6 text-primary" />
@@ -259,7 +259,7 @@ const Settings = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="game-card">
+                <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
                   <CardHeader>
                     <CardTitle className="font-futuristic text-2xl flex items-center gap-3">
                       <Shield className="w-6 h-6 text-primary" />
@@ -292,7 +292,7 @@ const Settings = () => {
 
             {/* Audio Settings */}
             <TabsContent value="audio">
-              <Card className="game-card">
+              <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
                 <CardHeader>
                   <CardTitle className="font-futuristic text-2xl flex items-center gap-3">
                     <Volume2 className="w-6 h-6 text-primary" />

@@ -367,8 +367,7 @@ const Leaderboard = () => {
             </div>
 
               {/* Discord Invite */}
-              <div className="mb-8">
-                <Card className="game-card max-w-2xl mx-auto">
+              <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 max-w-2xl mx-auto">
                   <CardContent className="pt-6 pb-6 text-center">
                     <p className="text-white mb-4 font-medium">
                       Want to join tournaments and win rewards? Connect with the community on our Discord.
@@ -383,7 +382,6 @@ const Leaderboard = () => {
                     </a>
                   </CardContent>
                 </Card>
-              </div>
 
             {/* Main Navigation */}
             <div className="flex justify-center mb-8">
@@ -404,7 +402,7 @@ const Leaderboard = () => {
             {/* Empty State */}
             {isEmpty && !globalLoading && !monthlyLoading && !yearlyLoading && (
               <div className="text-center mb-16">
-                <Card className="game-card max-w-2xl mx-auto">
+                <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 max-w-2xl mx-auto">
                   <CardContent className="pt-8 pb-8">
                     <Trophy className="w-16 h-16 mx-auto mb-4 text-primary/50" />
                     <h3 className="text-2xl font-futuristic font-bold text-white mb-4">
@@ -442,7 +440,7 @@ const Leaderboard = () => {
                 ) : globalLeaderboard && globalLeaderboard.length > 0 ? (
                   <>
                     {renderTop3Podium(globalLeaderboard, true)}
-                    <Card className="faction-card">
+                    <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
                       <CardHeader>
                         <CardTitle className="font-futuristic text-2xl text-center">Complete Rankings</CardTitle>
                       </CardHeader>
@@ -489,7 +487,7 @@ const Leaderboard = () => {
                   </div>
                 </div>
 
-                <Card className="game-card">
+                <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105">
                   <CardHeader>
                     <CardTitle className="font-futuristic text-2xl text-center mb-4">
                       {GAMES_CONFIG[selectedGame as keyof typeof GAMES_CONFIG].name}
