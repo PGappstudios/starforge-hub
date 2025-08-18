@@ -29,7 +29,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
       velocity: { x: 0, y: 0 },
       width: 56.25, // 45 * 1.25
       height: 75,   // 60 * 1.25
-      health: 100,
+      health: 100, // Keep for compatibility but not used
       score: 0
     },
     bullets: [],
@@ -1080,8 +1080,8 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
               bullet.position.y < newState.player.position.y + newState.player.height &&
               bullet.position.y + bullet.height > newState.player.position.y) {
             
-            // Damage player health instead of immediately losing life
-            newState.player.health -= bullet.damage;
+            // Immediately lose a life when hit by enemy bullet
+            newState.lives -= 1;
             bulletHit = true;
 
             // Create explosion effect at player center when hit
@@ -1090,12 +1090,6 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
             const explosion = createExplosion(explosionX, explosionY, 'medium');
             newState.explosions.push(explosion);
             playExplosionSound();
-
-            // Check if player health is depleted
-            if (newState.player.health <= 0) {
-              newState.lives -= 1;
-              newState.player.health = 100; // Reset health for next life
-            }
           }
         }
 
@@ -1150,8 +1144,8 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
             newState.player.position.y < enemy.position.y + enemy.height &&
             newState.player.position.y + newState.player.height > enemy.position.y) {
           
-          // Damage player health instead of immediately losing life
-          newState.player.health -= 50; // Enemy collision does significant damage
+          // Immediately lose a life when colliding with enemy
+          newState.lives -= 1;
 
           // Create explosion effect at collision point
           const explosionX = (newState.player.position.x + newState.player.width / 2 + enemy.position.x + enemy.width / 2) / 2;
@@ -1159,12 +1153,6 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
           const explosion = createExplosion(explosionX, explosionY, 'large');
           newState.explosions.push(explosion);
           playExplosionSound();
-
-          // Check if player health is depleted
-          if (newState.player.health <= 0) {
-            newState.lives -= 1;
-            newState.player.health = 100; // Reset health for next life
-          }
 
           // Remove the enemy that hit the player
           newState.enemies = newState.enemies.filter(e => e.id !== enemy.id);
@@ -1178,8 +1166,8 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
             newState.player.position.y < asteroid.position.y + asteroid.height &&
             newState.player.position.y + newState.player.height > asteroid.position.y) {
           
-          // Damage player health instead of immediately losing life
-          newState.player.health -= 40; // Asteroid collision does moderate damage
+          // Immediately lose a life when colliding with asteroid
+          newState.lives -= 1;
 
           // Create explosion effect at collision point
           const explosionX = (newState.player.position.x + newState.player.width / 2 + asteroid.position.x + asteroid.width / 2) / 2;
@@ -1187,12 +1175,6 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
           const explosion = createExplosion(explosionX, explosionY, 'large');
           newState.explosions.push(explosion);
           playExplosionSound();
-
-          // Check if player health is depleted
-          if (newState.player.health <= 0) {
-            newState.lives -= 1;
-            newState.player.health = 100; // Reset health for next life
-          }
 
           // Remove the asteroid that hit the player
           newState.asteroids = newState.asteroids.filter(a => a.id !== asteroid.id);
@@ -1693,7 +1675,7 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
       player: {
         ...prev.player,
         position: { x: CANVAS_WIDTH / 2 - 28.125, y: CANVAS_HEIGHT - 112.5 },
-        health: 100,
+        health: 100, // Keep for compatibility but not used
         score: 0
       }
     }));
