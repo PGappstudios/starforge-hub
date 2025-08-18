@@ -42,6 +42,7 @@ export class MemoryStorage {
   private users: Map<number, User> = new Map();
   private usersByEmail: Map<string, number> = new Map();
   private usersByUsername: Map<string, number> = new Map();
+  private usersByDiscordId: Map<string, number> = new Map();
   private nextUserId = 1;
 
   private global: Map<number, GlobalLeaderboardEntry> = new Map();
@@ -67,13 +68,43 @@ export class MemoryStorage {
     return id ? this.users.get(id) : undefined;
   }
 
-  async createUser(insertUser: { username: string; email: string; password: string }): Promise<User> {
-    const now = new Date().toISOString();
+  async getUserByDiscordId(discordId: string): Promise<User | undefined> {
+    const id = this.usersByDiscordId.get(discordId);
+    return id ? this.users.get(id) : undefined;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) throw new Error('User not found');
+    const updatedUser = { ...user, ...updates, updatedAt: new Date() };
+    this.users.set(id, updatedUser);
+    
+    // Update indexes if needed
+    if (updates.email && updates.email !== user.email) {
+      if (user.email) this.usersByEmail.delete(user.email);
+      this.usersByEmail.set(updates.email, id);
+    }
+    if (updates.username && updates.username !== user.username) {
+      this.usersByUsername.delete(user.username);
+      this.usersByUsername.set(updates.username, id);
+    }
+    if (updates.discordId && updates.discordId !== user.discordId) {
+      if (user.discordId) this.usersByDiscordId.delete(user.discordId);
+      this.usersByDiscordId.set(updates.discordId, id);
+    }
+    
+    return updatedUser;
+  }
+
+  async createUser(insertUser: { username: string; email: string; password?: string; discordId?: string; discordUsername?: string; discordAvatar?: string }): Promise<User> {
     const user: User = {
       id: this.nextUserId++,
       username: insertUser.username,
       email: insertUser.email,
-      password: insertUser.password,
+      password: insertUser.password || null,
+      discordId: insertUser.discordId || null,
+      discordUsername: insertUser.discordUsername || null,
+      discordAvatar: insertUser.discordAvatar || null,
       solanaWallet: null,
       faction: null,
       totalPoints: 0,
@@ -86,8 +117,11 @@ export class MemoryStorage {
     };
 
     this.users.set(user.id, user);
-    this.usersByEmail.set(user.email as string, user.id);
+    this.usersByEmail.set(user.email, user.id);
     this.usersByUsername.set(user.username, user.id);
+    if (insertUser.discordId) {
+      this.usersByDiscordId.set(insertUser.discordId, user.id);
+    }
     return user;
   }
 

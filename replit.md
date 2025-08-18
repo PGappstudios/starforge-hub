@@ -17,6 +17,11 @@ The frontend features a tabbed interface for navigation between global and game-
 The application utilizes a React frontend with TypeScript for type safety and maintainability. The backend is built with Express.js, providing a robust API layer. Persistent data storage is handled by a PostgreSQL database.
 
 ### Feature Specifications
+- **Authentication System**:
+    - **Discord OAuth Integration**: Primary authentication method using Discord accounts.
+    - **Legacy Email/Password Support**: Existing email/password authentication still available.
+    - **Account Linking**: Existing email accounts can be linked to Discord profiles.
+    - **Seamless User Experience**: Discord users are automatically created with Discord profile information.
 - **Leaderboard System**:
     - **Individual Game Leaderboards**: Six separate leaderboards, one for each game, with monthly and yearly resets.
     - **Global Leaderboard**: A permanent, never-resetting leaderboard combining overall player points.
@@ -25,7 +30,7 @@ The application utilizes a React frontend with TypeScript for type safety and ma
     - **Multiple Ranking Types**: Score-based for individual games, points-based for global.
     - **User Position Tracking**: Users can view their current rank across all leaderboards.
     - **Faction Statistics**: Aggregated statistics are available by user faction (oni, mud, ustur).
-- **User Management**: Direct user registration and authentication, with profile updates.
+- **User Management**: Discord OAuth and direct user registration/authentication, with profile updates.
 - **Game Integration**: Games interact with the leaderboard system via a utility function (`recordGameSession`) to submit scores and points.
 - **Credit System**: Integration with Stripe for payment processing to purchase in-game credits, featuring different credit packages.
 
@@ -71,3 +76,13 @@ The server expects static files at `dist/public/` and serves them using Express 
 
 - **PostgreSQL**: Used for all persistent data storage, including users, game-specific leaderboards, and the global leaderboard. Utilizes Neon serverless for database hosting.
 - **Stripe**: Integrated for payment processing, specifically for handling in-game credit purchases using Payment Intents API and `price_data` for custom line items.
+- **Discord OAuth**: Primary authentication provider requiring Discord application credentials (Client ID, Client Secret, Callback URL) for seamless user sign-in.
+
+## Recent Changes (August 18, 2025)
+
+### Discord Authentication Integration
+- **Database Schema Updates**: Added Discord-specific fields to users table (discordId, discordUsername, discordAvatar).
+- **Passport.js Integration**: Implemented Discord OAuth strategy with automatic account creation and linking.
+- **Frontend Updates**: Modified AuthForm component to include Discord login buttons with official Discord branding.
+- **OAuth Flow**: Complete implementation of Discord OAuth flow with callback handling and error management.
+- **User Experience**: Users can now sign in instantly with their Discord accounts, with automatic profile creation.

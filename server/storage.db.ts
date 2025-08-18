@@ -50,7 +50,21 @@ export class DatabaseStorage {
     return user || undefined;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async getUserByDiscordId(discordId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.discordId, discordId));
+    return user || undefined;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  async createUser(insertUser: InsertUser | { username: string; email: string; password?: string; discordId?: string; discordUsername?: string; discordAvatar?: string }): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }

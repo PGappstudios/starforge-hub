@@ -5,7 +5,9 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: { username: string; email: string; password: string }): Promise<User>;
+  getUserByDiscordId(discordId: string): Promise<User | undefined>;
+  createUser(user: { username: string; email: string; password?: string; discordId?: string; discordUsername?: string; discordAvatar?: string }): Promise<User>;
+  updateUser(id: number, updates: Partial<User>): Promise<User>;
   updateUserProfile(id: number, profile: UpdateUserProfile): Promise<User | undefined>;
   updateUserCredits(userId: number, credits: number): Promise<User | undefined>;
   addUserCredits(userId: number, amount: number): Promise<User | undefined>;
@@ -62,7 +64,9 @@ export const storage = {
   async getUser(id: number) { return (await getStorage()).getUser(id); },
   async getUserByUsername(username: string) { return (await getStorage()).getUserByUsername(username); },
   async getUserByEmail(email: string) { return (await getStorage()).getUserByEmail(email); },
-  async createUser(user: { username: string; email: string; password: string }) { return (await getStorage()).createUser(user); },
+  async createUser(user: { username: string; email: string; password?: string; discordId?: string; discordUsername?: string; discordAvatar?: string }) { return (await getStorage()).createUser(user); },
+  async getUserByDiscordId(discordId: string) { return (await getStorage()).getUserByDiscordId(discordId); },
+  async updateUser(id: number, updates: Partial<any>) { return (await getStorage()).updateUser(id, updates); },
   async updateUserProfile(id: number, profile: any) { return (await getStorage()).updateUserProfile(id, profile); },
   async updateUserCredits(userId: number, credits: number) { return (await getStorage()).updateUserCredits(userId, credits); },
   async addUserCredits(userId: number, amount: number) { return (await getStorage()).addUserCredits(userId, amount); },

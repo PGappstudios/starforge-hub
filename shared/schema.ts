@@ -8,12 +8,15 @@ export const factionEnum = pgEnum('faction', ['oni', 'mud', 'ustur']);
 export const leaderboardTypeEnum = pgEnum('leaderboard_type', ['monthly', 'yearly']);
 export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'succeeded', 'failed', 'refunded']);
 
-// Users table
+// Users table - Discord OAuth integration
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: varchar('username', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }), // Optional for Discord users
+  email: varchar('email', { length: 255 }).notNull(),
+  discordId: varchar('discord_id', { length: 255 }).unique(), // Discord user ID
+  discordUsername: varchar('discord_username', { length: 255 }), // Discord username
+  discordAvatar: varchar('discord_avatar', { length: 255 }), // Discord avatar hash
   solanaWallet: varchar('solana_wallet', { length: 255 }),
   faction: factionEnum('faction'),
   totalPoints: integer('total_points').notNull().default(0),

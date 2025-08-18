@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { stripe, CREDIT_PACKAGES, getPackageById, getTotalCredits, constructEvent } from "./stripe";
+import passport from "./passport";
 
 // Define validation schemas (moved from deleted schema.ts)
 const insertUserSchema = z.object({
@@ -73,6 +74,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sameSite: 'lax'
     }
   }));
+
+  // Initialize passport
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Discord OAuth routes
+  app.get('/api/auth/discord', passport.authenticate('discord'));
+  
+  app.get('/api/auth/discord/callback', 
+    passport.authenticate('discord', { failureRedirect: '/?auth=error' }),
+    (req, res) => {
+      // Successful authentication, redirect home.
+      res.redirect('/?auth=success');
+    }
+  );
 
   // Session debug endpoint (development only)
   if (process.env.NODE_ENV === 'development') {
@@ -151,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const isValidPassword = await bcrypt.compare(password, user.password);
+      const isValidPassword = user.password && await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
