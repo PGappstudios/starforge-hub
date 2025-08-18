@@ -17,7 +17,7 @@ const Navigation = () => {
   const navItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/dashboard", label: "Dashboard", icon: Users },
-    { path: "/wheel-of-iris", label: "Dice of Iris", icon: Zap },
+    { path: "/dice-of-iris", label: "Dice of Iris", icon: Zap },
     { path: "/leaderboard", label: "Leaderboard", icon: BarChart3 },
     { path: "/credits", label: "Credits", icon: Coins },
     { path: "/ss-ip", label: "SS-IP", icon: Star },
@@ -54,7 +54,7 @@ const Navigation = () => {
           <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 lg:flex-1 lg:justify-center">
             {navItems.map(({ path, label, icon: Icon }) => {
               // Special handling for Dice of Iris to include credits
-              if (path === "/wheel-of-iris") {
+              if (path === "/dice-of-iris") {
                 return (
                   <Link key={path} to={path}>
                     <Button
