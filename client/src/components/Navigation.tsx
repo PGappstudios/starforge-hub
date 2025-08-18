@@ -1,13 +1,18 @@
 
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, BarChart3, Users, Zap, Settings, Coins, Star } from "lucide-react";
+import { Home, BarChart3, Users, Zap, Settings, Coins, Star, LogIn, LogOut, User } from "lucide-react";
 import { useCredits } from "@/contexts/CreditsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthForm from "@/components/AuthForm";
 
 const Navigation = () => {
   const location = useLocation();
   const { credits } = useCredits();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [showAuthForm, setShowAuthForm] = useState(false);
   
   const navItems = [
     { path: "/", label: "Home", icon: Home },
@@ -18,6 +23,22 @@ const Navigation = () => {
     { path: "/ss-ip", label: "SS-IP", icon: Star },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
+
+  const handleSignIn = () => {
+    setShowAuthForm(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthForm(false);
+  };
+
+  const handleAuthClose = () => {
+    setShowAuthForm(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
 
 
   return (
@@ -71,10 +92,45 @@ const Navigation = () => {
             })}
           </div>
 
-          {/* Spacer for balanced layout on large screens */}
-          <div className="hidden lg:block lg:flex-shrink-0 lg:w-32"></div>
+          {/* Authentication Controls */}
+          <div className="flex items-center gap-2 lg:flex-shrink-0">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline text-sm text-white/70">
+                  {user?.email}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="hover:bg-primary/20"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignIn}
+                className="hover:bg-primary/20"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Authentication Modal */}
+      {showAuthForm && (
+        <AuthForm
+          onAuthSuccess={handleAuthSuccess}
+          onClose={handleAuthClose}
+        />
+      )}
     </nav>
   );
 };
