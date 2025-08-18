@@ -260,7 +260,8 @@ const Settings = () => {
                         type="email"
                         value={user.email}
                         disabled
-                        className="bg-black/10 border-white/20 opacity-60"
+                        readOnly
+                        className="bg-black/10 border-white/20 opacity-60 cursor-not-allowed"
                       />
                       <p className="text-xs text-white/60">Email address cannot be changed</p>
                     </div>

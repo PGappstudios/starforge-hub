@@ -19,7 +19,6 @@ const insertUserSchema = z.object({
 
 const updateUserProfileSchema = z.object({
   faction: z.enum(["oni", "mud", "ustur"]).optional(),
-  email: z.string().email().optional().or(z.literal("")),
   solanaWallet: z.string().optional().or(z.literal("")),
   credits: z.number().int().min(0).optional(),
 });
