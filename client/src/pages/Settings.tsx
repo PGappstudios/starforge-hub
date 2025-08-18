@@ -26,6 +26,7 @@ import {
   Save,
   RefreshCw
 } from "lucide-react";
+import { useAudioManager } from "@/contexts/AudioManagerContext";
 
 const Settings = () => {
   // Authentication
@@ -37,6 +38,9 @@ const Settings = () => {
     showIntroVideo, 
     setShowIntroVideo
   } = useSettings();
+
+  // Settings Context for Audio
+  const { audioSettings, updateAudioSettings } = useAudioManager();
 
   // Profile Settings (synced with user data)
   const [selectedFaction, setSelectedFaction] = useState<"oni" | "mud" | "ustur">(user?.faction || "oni");
@@ -100,25 +104,25 @@ const Settings = () => {
         email: email.trim() || undefined,
         solanaWallet: solanaWallet.trim() || undefined
       });
-      
+
       toast({
         title: "Profile Updated!",
         description: "Your profile has been successfully updated.",
       });
     } catch (error: any) {
       console.error('Profile update error:', error);
-      
+
       let errorMessage = "Failed to update profile. Please try again.";
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
-      
+
       // If it's an authentication error, redirect to home
       if (error.message?.includes('authenticated') || error.message?.includes('401')) {
         setTimeout(() => {
@@ -135,6 +139,13 @@ const Settings = () => {
     setEmail(user.email || "");
     setSolanaWallet(user.solanaWallet || "");
     setShowIntroVideo(true);
+    // Reset audio settings to default as well
+    updateAudioSettings({
+      masterVolume: 1,
+      musicVolume: 0.5,
+      sfxVolume: 0.5,
+      voiceVolume: 0.5,
+    });
     toast({
       title: "Settings Reset",
       description: "Settings reset to defaults!",
@@ -306,7 +317,85 @@ const Settings = () => {
               </div>
             </TabsContent>
 
+            {/* Audio Settings Tab */}
+            <TabsContent value="audio" className="mt-8">
+              <Card className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30">
+                <CardHeader>
+                  <CardTitle className="font-futuristic text-2xl flex items-center gap-3">
+                    <Monitor className="w-6 h-6 text-primary" />
+                    Audio Settings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {/* Master Volume */}
+                  <div className="space-y-4">
+                    <Label htmlFor="master-volume" className="font-futuristic text-lg">Master Volume</Label>
+                    <Slider
+                      id="master-volume"
+                      value={[audioSettings.masterVolume * 100]}
+                      onValueChange={(value) => updateAudioSettings({ masterVolume: value[0] / 100 })}
+                      max={100}
+                      step={1}
+                      className="[&>span:first-child]:bg-primary"
+                    />
+                    <div className="flex justify-between text-white/70">
+                      <span>{Math.round(audioSettings.masterVolume * 100)}%</span>
+                    </div>
+                  </div>
 
+                  {/* Music Volume */}
+                  <div className="space-y-4">
+                    <Label htmlFor="music-volume" className="font-futuristic text-lg">Music Volume</Label>
+                    <Slider
+                      id="music-volume"
+                      value={[audioSettings.musicVolume * 100]}
+                      onValueChange={(value) => updateAudioSettings({ musicVolume: value[0] / 100 })}
+                      max={100}
+                      step={1}
+                      className="[&>span:first-child]:bg-secondary"
+                    />
+                    <div className="flex justify-between text-white/70">
+                      <span>{Math.round(audioSettings.musicVolume * 100)}%</span>
+                    </div>
+                  </div>
+
+                  {/* SFX Volume */}
+                  <div className="space-y-4">
+                    <Label htmlFor="sfx-volume" className="font-futuristic text-lg">SFX Volume</Label>
+                    <Slider
+                      id="sfx-volume"
+                      value={[audioSettings.sfxVolume * 100]}
+                      onValueChange={(value) => updateAudioSettings({ sfxVolume: value[0] / 100 })}
+                      max={100}
+                      step={1}
+                      className="[&>span:first-child]:bg-accent"
+                    />
+                    <div className="flex justify-between text-white/70">
+                      <span>{Math.round(audioSettings.sfxVolume * 100)}%</span>
+                    </div>
+                  </div>
+
+                  {/* Voice Volume */}
+                  <div className="space-y-4">
+                    <Label htmlFor="voice-volume" className="font-futuristic text-lg">Voice Volume</Label>
+                    <Slider
+                      id="voice-volume"
+                      value={[audioSettings.voiceVolume * 100]}
+                      onValueChange={(value) => updateAudioSettings({ voiceVolume: value[0] / 100 })}
+                      max={100}
+                      step={1}
+                      className="[&>span:first-child]:bg-purple-500"
+                    />
+                    <div className="flex justify-between text-white/70">
+                      <span>{Math.round(audioSettings.voiceVolume * 100)}%</span>
+                    </div>
+                  </div>
+
+                  {/* Music controls removed - use Music Player component only */}
+
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
 
           {/* Action Buttons */}

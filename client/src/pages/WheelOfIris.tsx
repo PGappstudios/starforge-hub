@@ -30,7 +30,7 @@ const DiceOfIris = () => {
   const [diceScale, setDiceScale] = useState(1);
   const [diceGlow, setDiceGlow] = useState(0);
   const [showResultAnimation, setShowResultAnimation] = useState(false);
-  
+
   // Cooldown system - 50 hours = 50 * 60 * 60 * 1000 milliseconds
   const COOLDOWN_HOURS = 50;
   const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
@@ -40,7 +40,7 @@ const DiceOfIris = () => {
   });
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [canRoll, setCanRoll] = useState(true);
-  
+
   const animationRef = useRef<number>();
   const rollSoundRef = useRef<HTMLAudioElement | null>(null);
   const stopSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -56,7 +56,7 @@ const DiceOfIris = () => {
 
       const now = Date.now();
       const timeSinceLastRoll = now - lastRollTime;
-      
+
       if (timeSinceLastRoll >= COOLDOWN_MS) {
         setCanRoll(true);
         setTimeRemaining(0);
@@ -67,15 +67,15 @@ const DiceOfIris = () => {
     };
 
     checkCooldown();
-    
+
     // Update countdown every second
     const interval = setInterval(checkCooldown, 1000);
-    
+
     return () => clearInterval(interval);
   }, [lastRollTime, COOLDOWN_MS]);
 
   useEffect(() => {
-    
+
     // Initialize audio files
     try {
       // Dice roll sound
@@ -84,27 +84,27 @@ const DiceOfIris = () => {
       rollAudio.volume = 0.6;
       rollAudio.load();
       rollSoundRef.current = rollAudio;
-      
+
       // Dice stop sound
       const stopAudio = new Audio('/assets/game6/correct-6033.mp3');
       stopAudio.preload = 'auto';
       stopAudio.volume = 0.7;
       stopAudio.load();
       stopSoundRef.current = stopAudio;
-      
+
       // Add event listeners for debugging
       rollAudio.addEventListener('canplaythrough', () => {
         console.log('Roll sound loaded successfully');
       });
-      
+
       stopAudio.addEventListener('canplaythrough', () => {
         console.log('Stop sound loaded successfully');
       });
-      
+
       rollAudio.addEventListener('error', (e) => {
         console.error('Roll audio loading error:', e);
       });
-      
+
       stopAudio.addEventListener('error', (e) => {
         console.error('Stop audio loading error:', e);
       });
@@ -119,22 +119,22 @@ const DiceOfIris = () => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const rollDice = useCallback(() => {
     if (isRolling || !canRoll) return;
-    
+
     setIsRolling(true);
     setResult(null);
-    
+
     // Play dice roll sound
     if (rollSoundRef.current) {
       try {
         rollSoundRef.current.currentTime = 0;
         const playPromise = rollSoundRef.current.play();
-        
+
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
@@ -148,19 +148,19 @@ const DiceOfIris = () => {
         console.log('Roll sound play error:', error);
       }
     }
-    
+
     // Roll a 6-sided dice - select random side
     const randomSideIndex = Math.floor(Math.random() * 6);
     const finalResult = diceSides[randomSideIndex];
-    
+
     // Animate the dice roll
     const startTime = Date.now();
     const duration = 2000; // 2 seconds
-    
+
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Fast spinning during roll, slowing down
       const speed = (1 - progress) * 20 + 1;
       setDiceRotation(prev => ({
@@ -168,13 +168,13 @@ const DiceOfIris = () => {
         y: prev.y + speed * 2,
         z: prev.z + speed * 4
       }));
-      
+
       // Show random faces during animation
       if (Math.random() < 0.3) {
         const randomIndex = Math.floor(Math.random() * 6);
         setCurrentFace(diceSides[randomIndex].value);
       }
-      
+
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
@@ -183,32 +183,32 @@ const DiceOfIris = () => {
         setCurrentFace(finalResult.value);
         setIsRolling(false);
         setShowResultAnimation(true);
-        
+
         // Dice landing animation sequence
         setDiceScale(1.3); // Grow
         setDiceGlow(1);    // Glow effect
-        
+
         setTimeout(() => {
           setDiceScale(0.9); // Shrink
         }, 150);
-        
+
         setTimeout(() => {
           setDiceScale(1); // Back to normal
           setDiceGlow(0.5);
         }, 300);
-        
+
         setTimeout(() => {
           setDiceGlow(0);
           setShowResultAnimation(false);
         }, 1000);
-        
+
         // Play dice stop sound
         setTimeout(() => {
           if (stopSoundRef.current) {
             try {
               stopSoundRef.current.currentTime = 0;
               const playPromise = stopSoundRef.current.play();
-              
+
               if (playPromise !== undefined) {
                 playPromise
                   .then(() => {
@@ -223,21 +223,21 @@ const DiceOfIris = () => {
             }
           }
         }, 100); // Play stop sound shortly after dice stops
-        
+
         // Award credits
         if (finalResult.credits > 0) {
           addCredits(finalResult.credits, `Dice roll: ${finalResult.value}`);
         }
-        
+
         // Save roll time for cooldown
         const rollTime = Date.now();
         setLastRollTime(rollTime);
         localStorage.setItem('diceOfIris_lastRoll', rollTime.toString());
-        
+
         setRollHistory(prev => [finalResult, ...prev.slice(0, 9)]);
       }
     };
-    
+
     animationRef.current = requestAnimationFrame(animate);
   }, [isRolling, canRoll, addCredits]);
 
@@ -245,7 +245,7 @@ const DiceOfIris = () => {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
     setRollHistory([]);
     setResult(null);
     setIsRolling(false);
@@ -292,7 +292,7 @@ const DiceOfIris = () => {
               <CardContent className="flex flex-col items-center space-y-6">
                 {/* Dice Container */}
                 <div className="relative">
-                  
+
                   {/* Dice */}
                   <div className="flex justify-center items-center h-80">
                     <div 
@@ -333,7 +333,7 @@ const DiceOfIris = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <Button 
                     onClick={rollDice}
                     disabled={isRolling || !canRoll}
@@ -415,7 +415,7 @@ const DiceOfIris = () => {
                     Each player can roll the dice once every <span className="font-bold">{COOLDOWN_HOURS} hours</span>
                   </div>
                 </div>
-                
+
                 {/* Roll Rewards */}
                 <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">

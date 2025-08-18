@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -16,13 +15,13 @@ const Game2 = () => {
   const [gameEnded, setGameEnded] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
-  
+
   const GAME_COST = 1;
 
   return (
     <div className={`min-h-screen ${isPlaying ? 'bg-black' : 'cosmic-bg'}`}>
       {!isPlaying && <Navigation />}
-      
+
       {!isPlaying && (
         <div className="container mx-auto px-4 py-8">
           {/* Back Button */}
@@ -110,7 +109,7 @@ const Game2 = () => {
                 </div>
               </div>
             )}
-            <SpaceSnake 
+            <SpaceSnake
               onGameStateChange={(isPlaying) => {
                 setIsPlaying(isPlaying);
                 if (isPlaying && !hasPlayedGame) {
@@ -123,7 +122,7 @@ const Game2 = () => {
                   setGameEnded(true);
                   // SpaceSnake handles score submission internally via recordGameSessionToAPI
                 }
-              }} 
+              }}
             />
           </>
         ) : (

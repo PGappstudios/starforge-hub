@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,19 +11,19 @@ import { useGameResults } from '@/hooks/useGameResults';
 
 const Game5 = () => {
   console.log('Game5 component rendering...');
-  
+
   const [gameResult, setGameResult] = useState<PuzzleResult | null>(null);
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
-  
+
   const GAME_COST = 1;
 
   const handleGameEnd = (result: PuzzleResult) => {
     console.log('Game ended with result:', result);
     setGameResult(result);
-    
+
     // Submit score to leaderboard
     if (result.score > 0) {
       submitGameResult(result.score, 'game5');
@@ -39,6 +38,11 @@ const Game5 = () => {
     }
   };
 
+  const playLiveSound = () => {
+    // All game sounds disabled - music player controls all audio
+    return;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 p-4">
       <div className="max-w-4xl mx-auto">
@@ -49,7 +53,7 @@ const Game5 = () => {
               Back to Game Hub
             </Button>
           </Link>
-          
+
           {/* Credit Status */}
           <div className="text-center mb-6">
             <Badge variant="outline" className="text-white border-white/50 bg-white/10">
@@ -73,7 +77,7 @@ const Game5 = () => {
               </CardContent>
             </Card>
           )}
-          
+
           <div className="text-center">
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-2">
               STAR SEEKERS PUZZLE
@@ -87,7 +91,7 @@ const Game5 = () => {
           </div>
         </div>
         {canAfford(GAME_COST) ? (
-          <PuzzleGame 
+          <PuzzleGame
             onGameStart={handleGameStart}
             onGameEnd={handleGameEnd}
           />

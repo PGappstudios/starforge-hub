@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,13 +15,13 @@ const Game4 = () => {
   const [hasPlayedGame, setHasPlayedGame] = useState(false);
   const { credits, canAfford, spendCredits } = useCredits();
   const { submitGameResult } = useGameResults();
-  
+
   const GAME_COST = 1;
 
   const handleGameEnd = (result: QuizResult) => {
     setGameResult(result);
     setGameStarted(false);
-    
+
     if (hasPlayedGame) {
       // Submit score to leaderboard
       if (result.points > 0) {
@@ -40,6 +39,12 @@ const Game4 = () => {
     setHasPlayedGame(true);
     spendCredits(GAME_COST, 'Lore Master - Game Started');
   };
+
+  const playGameOverSound = () => {
+    // All game sounds disabled - music player controls all audio
+    return;
+  };
+
 
   if (gameStarted) {
     return (
@@ -74,7 +79,7 @@ const Game4 = () => {
             Back to Game Hub
           </Button>
         </Link>
-        
+
         {/* Credit Status */}
         <div className="text-center mb-6">
           <Badge variant="outline" className="text-white border-white/50 bg-white/10">
@@ -125,7 +130,7 @@ const Game4 = () => {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <h3 className="text-2xl font-semibold text-white mb-4">Game Rules</h3>

@@ -24,25 +24,10 @@ export const usePageMusic = () => {
   }, []);
 
   useEffect(() => {
-    const config = pageMusicConfig[location.pathname];
-    
-    // Add a delay to prevent rapid track switching during navigation
-    const timeoutId = setTimeout(() => {
-      // If a specific track is requested for this page
-      if (config?.specificTrack) {
-        const track = allTracks.find(t => t.filename === config.specificTrack);
-        if (track && (!currentTrack || currentTrack.filename !== config.specificTrack)) {
-          console.log(`Switching to specific track: ${track.name} for page: ${location.pathname}`);
-          playTrack(track);
-        }
-      } else {
-        // Do not auto-start generic music here; MusicPlayer controls app music
-        console.log(`Page ${location.pathname} has no specific track; deferring to MusicPlayer`);
-      }
-    }, 500); // 500ms delay to prevent rapid switching
-
-    return () => clearTimeout(timeoutId);
-  }, [location.pathname, playTrack, allTracks, currentTrack, playAllTracks, isPlaying]);
+    // Completely disable automatic music starting from page navigation
+    // All music control is now handled solely by the MusicPlayer component
+    console.log(`Page ${location.pathname} loaded - music control disabled, use MusicPlayer only`);
+  }, [location.pathname]);
 
   return {
     currentPageConfig: pageMusicConfig[location.pathname],

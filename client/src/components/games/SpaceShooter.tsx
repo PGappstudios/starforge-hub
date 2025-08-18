@@ -126,42 +126,32 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
 
   // Play explosion sound
   const playExplosionSound = () => {
-    if (explosionSound) {
-      explosionSound.currentTime = 0; // Reset to start
-      explosionSound.play().catch(e => console.log('Sound play failed:', e)); // Handle audio policy restrictions
-    }
+    // All game sounds disabled - music player controls all audio
+    return;
   };
 
   // Play game over sound
   const playGameOverSound = () => {
-    if (gameOverSound) {
-      gameOverSound.currentTime = 0; // Reset to start
-      gameOverSound.play().catch(e => console.log('Sound play failed:', e)); // Handle audio policy restrictions
-    }
+    // All game sounds disabled - music player controls all audio
+    return;
   };
 
   // Play laser sound
   const playLaserSound = () => {
-    if (laserSound) {
-      laserSound.currentTime = 0; // Reset to start for rapid fire
-      laserSound.play().catch(e => console.log('Sound play failed:', e)); // Handle audio policy restrictions
-    }
+    // All game sounds disabled - music player controls all audio
+    return;
   };
 
   // Play extra life sound
   const playLiveSound = () => {
-    if (liveSound) {
-      liveSound.currentTime = 0;
-      liveSound.play().catch(e => console.log('Sound play failed:', e));
-    }
+    // All game sounds disabled - music player controls all audio
+    return;
   };
 
   // Play power-up sound
   const playPowerUpSound = () => {
-    if (powerUpSound) {
-      powerUpSound.currentTime = 0;
-      powerUpSound.play().catch(e => console.log('Sound play failed:', e));
-    }
+    // All game sounds disabled - music player controls all audio
+    return;
   };
 
   // Create explosion effect
@@ -1089,7 +1079,6 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
               bullet.position.y < newState.player.position.y + newState.player.height &&
               bullet.position.y + bullet.height > newState.player.position.y) {
             newState.lives -= 1;
-            bulletHit = true;
 
             // Create explosion effect at player center when hit
             const explosionX = newState.player.position.x + newState.player.width / 2;
