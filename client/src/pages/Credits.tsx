@@ -99,18 +99,9 @@ const Credits = () => {
             name: "Gamer Pack",
             credits: 250,
             price: 9.99,
-            bonus: 50,
+            bonus: 0,
             description: "Best value for dedicated gamers",
             popular: true
-          },
-          {
-            id: "champion",
-            name: "Champion Pack",
-            credits: 500,
-            price: 19.99,
-            bonus: 100,
-            description: "For the ultimate gaming experience",
-            popular: false
           }
         ]);
       } finally {
@@ -256,7 +247,7 @@ const Credits = () => {
                 {!loadingPackages && (
                   <div className="grid md:grid-cols-2 gap-6">
                     {availablePackages
-                      .filter((pkg) => pkg.id !== 'pro' && !(pkg.name || '').toLowerCase().includes('pro'))
+                      .filter((pkg) => pkg.id !== 'pro' && pkg.id !== 'champion' && !(pkg.name || '').toLowerCase().includes('pro'))
                       .map((pkg) => (
                     <Card 
                       key={pkg.id} 
@@ -293,7 +284,7 @@ const Credits = () => {
                             </div>
                           )}
                           <div className="text-lg text-white/70">
-                            Total: {pkg.credits + pkg.bonus} Credits
+                            Total: {pkg.credits} Credits
                           </div>
                         </div>
                         

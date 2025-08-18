@@ -32,15 +32,7 @@ export const CREDIT_PACKAGES = {
     description: 'Best value for dedicated gamers',
     popular: true,
   },
-  champion: {
-    id: 'champion',
-    name: 'Champion Pack',
-    credits: 500,
-    bonus: 100,
-    price: 19.99,
-    description: 'For the ultimate gaming experience',
-    popular: false,
-  },
+  
 } as const;
 
 export type PackageId = keyof typeof CREDIT_PACKAGES;
