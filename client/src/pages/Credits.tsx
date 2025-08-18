@@ -91,6 +91,7 @@ const Credits = () => {
             credits: 100,
             price: 4.99,
             bonus: 0,
+            description: "Perfect for casual players",
             popular: false
           },
           {
@@ -98,8 +99,18 @@ const Credits = () => {
             name: "Gamer Pack",
             credits: 250,
             price: 9.99,
-            bonus: 0,
+            bonus: 50,
+            description: "Best value for dedicated gamers",
             popular: true
+          },
+          {
+            id: "champion",
+            name: "Champion Pack",
+            credits: 500,
+            price: 19.99,
+            bonus: 100,
+            description: "For the ultimate gaming experience",
+            popular: false
           }
         ]);
       } finally {

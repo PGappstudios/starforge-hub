@@ -540,7 +540,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(Object.values(CREDIT_PACKAGES));
   });
 
-  // Create Stripe Checkout Session (following official documentation)
+  // Create Stripe Checkout Session with custom line items
   app.post("/api/stripe/create-checkout-session", async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ message: "Not authenticated" });
@@ -561,17 +561,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Create Stripe checkout session
+      // Create Stripe checkout session with custom line item
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
-            price: pkg.stripePriceId,
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: pkg.name,
+                description: `${pkg.credits + pkg.bonus} credits for Star Seekers Gaming Platform`,
+              },
+              unit_amount: Math.round(pkg.price * 100), // Convert to cents
+            },
             quantity: 1,
           },
         ],
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/credits?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/credits?canceled=true`,
+        success_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?canceled=true`,
         customer_email: user.email,
         metadata: {
           userId: req.session.userId.toString(),
@@ -665,7 +672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           packageId,
           credits: expectedCredits.toString(),
           username: user.username,
-          priceId: pkg.stripePriceId,
+          packageName: pkg.name,
         },
         description: `StarForge Hub - ${pkg.name} (${expectedCredits} credits)`,
       });
@@ -686,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         packageId,
         credits: expectedCredits,
         amount: Math.round(pkg.price * 100),
-        priceId: pkg.stripePriceId,
+        packageName: pkg.name,
       });
     } catch (error: any) {
       console.error('Create payment intent error:', {
