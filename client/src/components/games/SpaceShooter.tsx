@@ -1622,46 +1622,20 @@ const SpaceShooter: React.FC<SpaceShooterProps> = ({ onGameStateChange, onGameEn
       const heartsText = '❤️'.repeat(gameState.lives);
       ctx.fillText(`Lives: ${heartsText}`, 20, 65);
 
-      // Player health bar
-      const healthBarWidth = 200;
-      const healthBarHeight = 15;
-      const healthBarX = 20;
-      const healthBarY = 85;
-      const healthPercent = gameState.player.health / 100;
-
-      // Health bar background
-      ctx.fillStyle = '#440000';
-      ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-      // Health bar fill
-      const healthColor = healthPercent > 0.6 ? '#00ff00' : healthPercent > 0.3 ? '#ffff00' : '#ff0000';
-      ctx.fillStyle = healthColor;
-      ctx.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercent, healthBarHeight);
-
-      // Health bar border
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-      // Health text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(`Health: ${gameState.player.health}%`, 20, 120);
-
       // Missile mode timer display
       if (missileMode && missileModeEndTime > Date.now()) {
         const remainingTime = Math.ceil((missileModeEndTime - Date.now()) / 1000);
         ctx.fillStyle = '#00ff00';
         ctx.shadowColor = '#00ff00';
         ctx.shadowBlur = 5;
-        ctx.fillText(`🚀 TRIPLE SHOT: ${remainingTime}s`, 20, 95);
+        ctx.fillText(`🚀 TRIPLE SHOT: ${remainingTime}s`, 20, 85);
         ctx.shadowBlur = 0;
       }
 
       // Double shot mode timer display
       if (doubleShotMode && doubleShotModeEndTime > Date.now()) {
         const remainingTime = Math.ceil((doubleShotModeEndTime - Date.now()) / 1000);
-        const yPosition = missileMode && missileModeEndTime > Date.now() ? 125 : 95; // Stack below triple shot if both active
+        const yPosition = missileMode && missileModeEndTime > Date.now() ? 105 : 85; // Stack below triple shot if both active
         ctx.fillStyle = '#0088ff';
         ctx.shadowColor = '#0088ff';
         ctx.shadowBlur = 5;
