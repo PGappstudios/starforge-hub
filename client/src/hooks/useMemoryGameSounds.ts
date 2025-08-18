@@ -10,7 +10,7 @@ export const useMemoryGameSounds = () => {
 
   // Initialize audio files
   useEffect(() => {
-    flipSoundRef.current = new Audio('/assets/game6/sounds/dice-95077.mp3');
+    flipSoundRef.current = new Audio('/assets/game3/sounds/flipcard-91468.mp3');
     flipSoundRef.current.volume = 0.4;
     flipSoundRef.current.preload = 'auto';
 
