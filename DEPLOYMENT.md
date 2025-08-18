@@ -1,78 +1,80 @@
-# StarForge Hub - Deployment Guide
+# Deployment Guide for StarForge Hub
 
-## Deployment Issue Fixed
+## Overview
+This document provides instructions for deploying the StarForge Hub gaming platform. The application requires a specific build process to properly structure files for production deployment.
 
-The deployment was failing because of a directory structure mismatch:
-- **Problem**: Server expected static files in `dist/public`, but Vite built to `client/dist`
-- **Solution**: Custom build script that properly structures files for deployment
+## Build Process
 
-## How to Deploy
+### Prerequisites
+- Node.js environment
+- All dependencies installed (`npm install` already completed)
+- Database configured (PostgreSQL)
+- Environment variables set (if using external services)
 
-### Option 1: Using Custom Build Script (Recommended)
+### Building for Production
+
+**Use the custom build script:**
 ```bash
-# Build for production
 node build.js
-
-# Deploy the dist/ directory
-# The static files will be in dist/public/
-# The server file will be in dist/index.js
 ```
 
-### Option 2: Manual Build Steps
-```bash
-# 1. Build client
-vite build
+This script will:
+1. Build the React frontend using Vite
+2. Create the proper directory structure (`dist/public/`)
+3. Copy all static files to the correct location
+4. Compile the Express server to `dist/index.js`
 
-# 2. Create dist directory structure
-mkdir -p dist/public
-
-# 3. Copy client files to expected location
-cp -r client/dist/* dist/public/
-
-# 4. Build server
-esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-```
-
-## Deployment Configuration
-
-### Expected Directory Structure After Build:
+### Expected Output Structure
+After running `node build.js`, you should see:
 ```
 dist/
-├── public/           # Static files (HTML, CSS, JS, assets)
-│   ├── index.html
-│   ├── assets/
-│   └── ...other static files
-└── index.js         # Built server file
+├── public/              # Static files (HTML, CSS, JS, assets)
+│   ├── assets/          # Bundled application files
+│   ├── index.html       # Main HTML file
+│   ├── favicon.ico      # Site icon
+│   └── ...             # Other static assets
+└── index.js            # Compiled Express server
 ```
 
-### Environment Variables Needed:
-- `DATABASE_URL` - PostgreSQL connection string
-- `STRIPE_PUBLISHABLE_KEY` - Stripe public key
-- `STRIPE_SECRET_KEY` - Stripe secret key  
-- `SESSION_SECRET` - Session encryption secret
-- `PORT` - Server port (defaults to 5000)
-
-### Production Start Command:
+### Starting Production Server
 ```bash
 NODE_ENV=production node dist/index.js
 ```
 
-## Build Script Details
+## Deployment on Replit
 
-The `build.js` script:
-1. Builds client with Vite (`vite build` → `client/dist`)
-2. Creates proper directory structure (`dist/public`)
-3. Copies client files to expected location (`client/dist` → `dist/public`)
-4. Builds server with esbuild (`server/index.ts` → `dist/index.js`)
+### For Replit Deployments:
+1. Run the build command: `node build.js`
+2. Ensure environment variables are set in Replit Secrets
+3. The deployment system will automatically use the built files
+4. Server will serve static files from `dist/public/` and API from the Express server
 
-## Verification
+### Important Notes:
+- **DO NOT** use the default `npm run build` script for deployment
+- **ALWAYS** use `node build.js` for production builds
+- The server expects static files at `dist/public/` (not `client/dist/`)
+- Both development and production modes are supported by the same codebase
 
+## Troubleshooting
+
+### Common Issues:
+1. **"Cannot find build directory"** - Run `node build.js` first
+2. **Static files not loading** - Verify files are in `dist/public/` not `client/dist/`
+3. **Server errors** - Check environment variables and database connection
+
+### Verification:
 After building, verify the structure:
 ```bash
 ls -la dist/
 ls -la dist/public/
 ```
 
-You should see:
-- `dist/index.js` (server file)
-- `dist/public/` directory with all static assets
+You should see the server file at `dist/index.js` and all static assets in `dist/public/`.
+
+## Environment Configuration
+
+Required environment variables for production:
+- `DATABASE_URL` - PostgreSQL database connection string
+- `SESSION_SECRET` - Session encryption key
+- `STRIPE_SECRET_KEY` - Stripe API key (if using payments)
+- `NODE_ENV=production` - Ensures production mode

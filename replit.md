@@ -38,6 +38,34 @@ The application utilizes a React frontend with TypeScript for type safety and ma
     - User authentication and profile management (`POST /api/register`, `POST /api/login`, `GET /api/user`, `PUT /api/user/profile`)
     - Retrieving game configuration (`GET /api/games/config`)
 - **Build Process**: A custom `build.js` script is used for production builds to ensure the correct directory structure (`dist/public/` for static assets and `dist/index.js` for the server) for deployment.
+  
+## Deployment Configuration
+
+### Build Process
+The project uses a custom `build.js` script that properly structures files for deployment:
+
+1. **Client Build**: Runs `vite build` to create optimized frontend assets in `client/dist/`
+2. **Directory Structure**: Creates `dist/public/` directory for static files
+3. **File Copy**: Copies all client build files from `client/dist/` to `dist/public/`
+4. **Server Build**: Compiles server TypeScript to `dist/index.js` using esbuild
+
+### Deployment Commands
+- **Development**: `npm run dev` (starts development server)
+- **Production Build**: `node build.js` (creates deployment-ready files)
+- **Production Start**: `NODE_ENV=production node dist/index.js`
+
+### Directory Structure After Build
+```
+dist/
+├── public/          # Static files served by Express
+│   ├── assets/      # Bundled CSS/JS files
+│   ├── index.html   # Main HTML file
+│   └── ...         # Other static assets
+└── index.js        # Compiled server file
+```
+
+### Replit Deployment
+The server expects static files at `dist/public/` and serves them using Express static middleware in production mode. The `build.js` script ensures this structure is correctly created for deployment.
 
 ## External Dependencies
 
