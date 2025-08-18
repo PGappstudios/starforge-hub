@@ -262,17 +262,21 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
     
     const clickedPiece = pieces[clickedIndex];
     
-    // Find empty piece (15)
-    const emptyIndex = pieces.indexOf(15);
+    // Skip empty pieces
+    if (clickedPiece === 15) return;
     
-    // Check if clicked piece is adjacent to empty piece
-    const isAdjacent = checkAdjacent(clickedIndex, emptyIndex);
-    
-    if (isAdjacent) {
-      // Swap pieces
+    if (selectedPiece === null) {
+      // First piece selection
+      setSelectedPiece(clickedIndex);
+    } else if (selectedPiece === clickedIndex) {
+      // Clicking same piece deselects it
+      setSelectedPiece(null);
+    } else {
+      // Second piece selection - swap them
       const newPieces = [...pieces];
-      [newPieces[clickedIndex], newPieces[emptyIndex]] = [newPieces[emptyIndex], newPieces[clickedIndex]];
+      [newPieces[selectedPiece], newPieces[clickedIndex]] = [newPieces[clickedIndex], newPieces[selectedPiece]];
       setPieces(newPieces);
+      setSelectedPiece(null);
       setMoves(prev => prev + 1);
       
       // Play sound
@@ -300,15 +304,7 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
     }
   };
 
-  const checkAdjacent = (index1: number, index2: number): boolean => {
-    const row1 = Math.floor(index1 / 4);
-    const col1 = index1 % 4;
-    const row2 = Math.floor(index2 / 4);
-    const col2 = index2 % 4;
-    
-    return (Math.abs(row1 - row2) === 1 && col1 === col2) || 
-           (Math.abs(col1 - col2) === 1 && row1 === row2);
-  };
+  // Remove unused adjacent check function since we're allowing any two pieces to swap
 
   const isPuzzleSolved = (currentPieces: number[]): boolean => {
     // Check if pieces are in order 0,1,2,...,14,15
@@ -349,14 +345,14 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
             <div className="text-6xl mb-4">🧩</div>
             <h2 className="text-2xl font-bold text-purple-400 mb-4">Star Seekers Puzzle</h2>
             <p className="text-gray-300 text-lg mb-6">
-              Solve beautiful Star Atlas artwork puzzles! You'll see a preview of the image, then arrange the scrambled pieces back together.
+              Solve beautiful Star Atlas artwork puzzles! Click two pieces to swap their positions and recreate the original image.
             </p>
             
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-purple-900/30 p-4 rounded-lg">
                 <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
                 <h3 className="font-bold text-purple-300">Goal</h3>
-                <p className="text-sm text-gray-400">Complete the image puzzle by clicking adjacent pieces</p>
+                <p className="text-sm text-gray-400">Click two pieces to swap their positions</p>
               </div>
               <div className="bg-blue-900/30 p-4 rounded-lg">
                 <Timer className="w-8 h-8 mx-auto mb-2 text-blue-400" />
@@ -421,7 +417,6 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
 
   // Render playing state
   if (gameStatus === 'playing') {
-    console.log('Playing state - imagePieces count:', imagePieces.length);
     return (
       <>
         <canvas ref={canvasRef} style={{ display: 'none' }} />
@@ -450,25 +445,26 @@ const PuzzleGame: React.FC<PuzzleGameProps> = ({ onGameStart, onGameEnd }) => {
           {/* Puzzle Grid */}
           <Card className="bg-gray-900 border-gray-700">
             <CardContent className="p-6">
-              <div className="grid grid-cols-4 gap-2 max-w-md mx-auto">
+              <div className="grid grid-cols-4 gap-0 max-w-md mx-auto border-2 border-purple-400">
                 {pieces.map((piece, index) => (
                   <div
                     key={index}
                     onClick={() => handlePieceClick(index)}
                     className={`
-                      aspect-square border-2 rounded-lg transition-all duration-200 cursor-pointer
+                      aspect-square border-0 transition-all duration-200 cursor-pointer
                       ${piece === 15 
-                        ? 'border-dashed border-gray-600 bg-transparent' 
-                        : 'border-purple-400 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50'
+                        ? 'bg-gray-800' 
+                        : 'hover:brightness-110'
                       }
-                      ${selectedPiece === index ? 'ring-2 ring-yellow-400' : ''}
+                      ${selectedPiece === index ? 'ring-4 ring-yellow-400 ring-inset' : ''}
                     `}
                   >
                     {piece !== 15 && imagePieces[piece] && (
                       <img
                         src={imagePieces[piece]}
                         alt={`Piece ${piece + 1}`}
-                        className="w-full h-full object-cover rounded-md"
+                        className="w-full h-full object-cover"
+                        draggable={false}
                       />
                     )}
                   </div>
