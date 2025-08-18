@@ -157,10 +157,32 @@ const Credits = () => {
     setShowCheckout(true);
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
     setShowCheckout(false);
     setSelectedPackage(null);
-    // The credits are added by the Stripe component
+    
+    // Refresh the credits from server
+    const { refreshCredits } = useCredits();
+    try {
+      await refreshCredits();
+      console.log('Credits refreshed after payment success');
+    } catch (error) {
+      console.error('Error refreshing credits:', error);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    const { refreshCredits } = useCredits();
+    try {
+      setLoadingPackages(true);
+      await refreshCredits();
+      await checkAuthStatus();
+      console.log('Manual credits refresh completed');
+    } catch (error) {
+      console.error('Error during manual refresh:', error);
+    } finally {
+      setLoadingPackages(false);
+    }
   };
 
   const handlePaymentCancel = () => {

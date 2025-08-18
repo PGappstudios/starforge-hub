@@ -16,6 +16,7 @@ interface CreditsContextType {
   spendCredits: (amount: number, description: string) => Promise<boolean>;
   canAfford: (amount: number) => boolean;
   resetCredits: () => void;
+  refreshCredits: () => Promise<boolean>;
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -139,6 +140,16 @@ export const CreditsProvider: React.FC<CreditsProviderProps> = ({ children }) =>
     localStorage.removeItem(TRANSACTIONS_KEY);
   };
 
+  const refreshCredits = async (): Promise<boolean> => {
+    try {
+      await checkAuthStatus();
+      return true;
+    } catch (error) {
+      console.error('Error refreshing credits:', error);
+      return false;
+    }
+  };
+
   return (
     <CreditsContext.Provider value={{
       credits,
@@ -146,7 +157,8 @@ export const CreditsProvider: React.FC<CreditsProviderProps> = ({ children }) =>
       addCredits,
       spendCredits,
       canAfford,
-      resetCredits
+      resetCredits,
+      refreshCredits
     }}>
       {children}
     </CreditsContext.Provider>

@@ -774,6 +774,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const session = event.data.object as any;
           console.log('💳 Checkout session completed:', session.id);
           console.log('🏷️ Session metadata:', session.metadata);
+          console.log('💳 Payment status:', session.payment_status);
+          
+          // Only process if payment is actually completed
+          if (session.payment_status !== 'paid') {
+            console.log('⏳ Payment not yet completed, skipping credit addition');
+            break;
+          }
           
           const { userId, packageId, credits } = session.metadata || {};
           
@@ -786,7 +793,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const creditsToAdd = parseInt(credits);
             const userIdNum = parseInt(userId);
             
+            if (isNaN(creditsToAdd) || isNaN(userIdNum)) {
+              console.error('❌ Invalid credit or user ID values:', { credits, userId });
+              break;
+            }
+            
             console.log(`💰 Adding ${creditsToAdd} credits to user ${userIdNum}`);
+            
+            // Check if user exists first
+            const existingUser = await storage.getUser(userIdNum);
+            if (!existingUser) {
+              console.error(`❌ User ${userIdNum} not found`);
+              break;
+            }
+            
+            console.log(`👤 User ${userIdNum} current credits: ${existingUser.credits}`);
             
             // Add credits to user account
             const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
@@ -794,8 +815,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (updatedUser) {
               console.log(`✅ Credits successfully added: User ${userIdNum} received ${creditsToAdd} credits for package ${packageId}`);
               console.log(`💰 User's new credit balance: ${updatedUser.credits}`);
+              
+              // Create a transaction record for payment tracking
+              await storage.createPayment({
+                userId: userIdNum,
+                stripePaymentIntentId: session.payment_intent || session.id,
+                packageId,
+                packageName: packageId,
+                amount: creditsToAdd,
+                credits: creditsToAdd,
+                currency: 'usd'
+              });
+              
+              console.log(`📝 Payment record created for session ${session.id}`);
             } else {
-              console.error(`❌ Failed to add credits - user ${userIdNum} not found`);
+              console.error(`❌ Failed to add credits - storage.addUserCredits returned null`);
             }
           } catch (error) {
             console.error('❌ Error adding credits from webhook:', error);
@@ -813,6 +847,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             try {
               const creditsToAdd = parseInt(credits);
               const userIdNum = parseInt(userId);
+              
+              if (isNaN(creditsToAdd) || isNaN(userIdNum)) {
+                console.error('❌ Invalid credit or user ID values for async payment:', { credits, userId });
+                break;
+              }
               
               // Add credits to user account for async payments (like bank transfers)
               const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
@@ -846,6 +885,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const creditsToAdd = parseInt(credits);
               const userIdNum = parseInt(userId);
               
+              if (isNaN(creditsToAdd) || isNaN(userIdNum)) {
+                console.error('❌ Invalid credit or user ID values for payment intent:', { credits, userId });
+                break;
+              }
+              
               // Add credits to user account
               const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
               
@@ -869,6 +913,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error.message });
     }
   });
+
+  // Debug endpoint to check recent webhook events (development only)
+  if (process.env.NODE_ENV === 'development') {
+    app.get("/api/stripe/webhook-debug", (req, res) => {
+      res.json({
+        message: "Webhook endpoint is accessible",
+        endpoint: "/api/stripe/webhook",
+        environment: process.env.NODE_ENV,
+        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ? "Set" : "Not set"
+      });
+    });
+  }
 
   // Get payment history for user
   app.get("/api/stripe/payment-history", async (req, res) => {
@@ -917,9 +973,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (userId && packageId && credits && parseInt(userId) === req.session.userId) {
           const creditsToAdd = parseInt(credits);
+          const userIdNum = parseInt(userId);
+          
+          if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+            return res.status(400).json({ message: "Invalid credits amount" });
+          }
           
           // Check if credits were already added by checking user's current balance
-          const user = await storage.getUser(req.session.userId);
+          const user = await storage.getUser(userIdNum);
           if (!user) {
             return res.status(404).json({ message: "User not found" });
           }
@@ -927,17 +988,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`💰 Current user credits: ${user.credits}`);
           console.log(`➕ Credits to add: ${creditsToAdd}`);
           
-          // Add credits (this will handle duplicates if needed)
-          const updatedUser = await storage.addUserCredits(req.session.userId, creditsToAdd);
+          // Add credits
+          const updatedUser = await storage.addUserCredits(userIdNum, creditsToAdd);
           
           if (updatedUser) {
-            console.log(`✅ Manual verification: Added ${creditsToAdd} credits to user ${req.session.userId}`);
+            console.log(`✅ Manual verification: Added ${creditsToAdd} credits to user ${userIdNum}`);
+            
+            // Create payment record if it doesn't exist
+            try {
+              await storage.createPayment({
+                userId: userIdNum,
+                stripePaymentIntentId: session.payment_intent || session.id,
+                packageId,
+                packageName: packageId,
+                amount: creditsToAdd,
+                credits: creditsToAdd,
+                currency: 'usd'
+              });
+              console.log(`📝 Payment record created for manual verification`);
+            } catch (paymentError) {
+              console.log(`ℹ️ Payment record may already exist:`, paymentError);
+            }
+            
             res.json({ 
               success: true, 
               message: `Successfully added ${creditsToAdd} credits`,
-              newBalance: updatedUser.credits 
+              previousBalance: user.credits,
+              newBalance: updatedUser.credits,
+              creditsAdded: creditsToAdd
             });
           } else {
+            console.error(`❌ Failed to add credits - storage method returned null`);
             res.status(500).json({ message: "Failed to add credits" });
           }
         } else {
@@ -946,7 +1027,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(400).json({ 
           message: "Payment not completed", 
-          status: session.payment_status 
+          status: session.payment_status,
+          sessionId: session.id
         });
       }
     } catch (error: any) {
