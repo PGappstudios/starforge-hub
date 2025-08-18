@@ -56,6 +56,7 @@
     background-attachment: fixed !important;
     background-repeat: no-repeat !important;
     position: relative;
+    min-height: 100vh;
   }
 
   .cosmic-bg::before {
@@ -73,6 +74,9 @@
       linear-gradient(135deg, rgba(10, 10, 10, 0.4) 0%, rgba(26, 10, 46, 0.3) 25%, rgba(22, 33, 62, 0.2) 50%, rgba(26, 10, 46, 0.3) 75%, rgba(10, 10, 10, 0.4) 100%);
     pointer-events: none;
     z-index: 1;
+    min-height: 100vh;
+    will-change: auto;
+    transform: translateZ(0);
   }
 
   .cosmic-bg::after {
@@ -281,6 +285,28 @@
 
   .space-card {
     @apply bg-black/20 backdrop-blur-lg border border-purple-500/25 rounded-xl p-6 transition-all duration-500 hover:bg-black/30 hover:border-purple-400/50 hover:shadow-2xl hover:shadow-purple-500/20;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    background-color: rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Ensure all cards have consistent transparency */
+  .bg-black\/20 {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .bg-black\/10 {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
 
   /* Cosmic Toast Notifications */
