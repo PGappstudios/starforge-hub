@@ -95,20 +95,15 @@ const Navigation = () => {
           {/* Authentication Controls */}
           <div className="flex items-center gap-2 lg:flex-shrink-0">
             {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden sm:inline text-sm text-white/70">
-                  {user?.email}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="hover:bg-primary/20"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="hover:bg-primary/20"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
             ) : (
               <Button
                 variant="ghost"
