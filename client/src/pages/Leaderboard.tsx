@@ -570,7 +570,7 @@ const Leaderboard = () => {
                   const avgPoints = factionPlayers.length > 0 ? Math.round(totalPoints / factionPlayers.length) : 0;
 
                   return (
-                    <Card key={faction} className="faction-card text-center">
+                    <Card key={faction} className="bg-black/20 backdrop-blur-md border border-white/20 rounded-xl transition-all duration-300 hover:bg-black/30 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/30 hover:scale-105 text-center">
                       <CardHeader>
                         <FactionAvatar faction={faction as any} size="lg" className="mx-auto mb-2" />
                         <CardTitle className="font-futuristic capitalize">{faction} Faction</CardTitle>
