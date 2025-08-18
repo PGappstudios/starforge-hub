@@ -109,6 +109,7 @@ All data is persistently stored in a PostgreSQL database using Neon serverless. 
 - **Environment Variables**: Successfully configured VITE_STRIPE_PUBLISHABLE_KEY and STRIPE_WEBHOOK_SECRET
 - **Frontend Updates**: Updated fallback packages in Credits page to match new structure
 - **Testing Confirmed**: Payment flow tested successfully with checkout session creation
+- **Production Redirects**: Updated Stripe redirect URLs to point to https://star-seekers.com/credits for seamless user experience
 
 ### 2025-08-18: Deployment Fix - Build Directory Structure Resolution
 - **Deployment Issue Resolved**: Fixed build process that was causing deployment failures

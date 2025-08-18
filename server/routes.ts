@@ -561,8 +561,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Determine the correct base URL for redirects
-      const baseUrl = process.env.FRONTEND_URL || `https://${process.env.REPLIT_DEV_DOMAIN}` || 'http://localhost:5000';
+      // Determine the correct base URL for redirects - prioritize production domain
+      const baseUrl = 'https://star-seekers.com';
       console.log(`Using base URL for Stripe redirects: ${baseUrl}`);
 
       // Create Stripe checkout session with custom line item
