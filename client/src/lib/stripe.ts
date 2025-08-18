@@ -1,7 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 
 // This is your Stripe publishable key (test mode for development)
-const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_your_key_here';
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_key_here';
 
 // Initialize Stripe
 let stripePromise: Promise<any>;
