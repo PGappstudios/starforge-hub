@@ -561,6 +561,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Determine the correct base URL for redirects
+      const baseUrl = process.env.FRONTEND_URL || `https://${process.env.REPLIT_DEV_DOMAIN}` || 'http://localhost:5000';
+      console.log(`Using base URL for Stripe redirects: ${baseUrl}`);
+
       // Create Stripe checkout session with custom line item
       const session = await stripe.checkout.sessions.create({
         line_items: [
@@ -577,8 +581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         mode: 'payment',
-        success_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/credits?canceled=true`,
+        success_url: `${baseUrl}/credits?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/credits?canceled=true`,
         customer_email: user.email,
         metadata: {
           userId: req.session.userId.toString(),
