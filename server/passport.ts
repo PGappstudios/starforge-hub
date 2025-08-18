@@ -52,7 +52,7 @@ passport.use(new DiscordStrategy({
       email: profile.email || `${profile.username}@discord.user`,
       discordId: profile.id,
       discordUsername: profile.username,
-      discordAvatar: profile.avatar,
+      discordAvatar: profile.avatar || undefined,
     });
 
     console.log('Created new Discord user:', newUser.id);
@@ -60,7 +60,7 @@ passport.use(new DiscordStrategy({
     
   } catch (error) {
     console.error('Discord OAuth error:', error);
-    return done(error, null);
+    return done(error as Error, false);
   }
 }));
 
